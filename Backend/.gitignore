@@ -1,0 +1,21 @@
+# Ignorar node_modules completos
+node_modules/
+
+# Ignorar archivos de logs
+*.log
+npm-debug.log*
+
+# Ignorar variables de entorno (archivos con datos sensibles)
+.env
+
+# Ignorar carpetas de construcción si las tienes
+dist/
+build/
+
+# Ignorar archivos de configuración de editores (VSCode, IntelliJ, etc.)
+.vscode/
+.idea/
+
+# Ignorar archivos del sistema operativo
+.DS_Store
+Thumbs.db
