@@ -3,47 +3,51 @@ const Moneda = require('./moneda.model');
 const Billetera = require('./billetera.model');
 const Anuncio = require('./anuncio.model');
 const Transaccion = require('./transaccion.model');
-
+const Token = require('./token.model')
 // Relaciones
 
-// User ↔ Wallet
-Billetera.belongsTo(Usuario);
-Usuario.hasMany(Billetera);
+// Usuario ↔ Billetera
+Billetera.belongsTo(Usuario, { onDelete: 'CASCADE' });
+Usuario.hasMany(Billetera, { onDelete: 'CASCADE' });
 
-// Wallet ↔ Moneda
-Billetera.belongsTo(Moneda);
-Moneda.hasMany(Billetera);
+// Moneda ↔ Billetera
+Billetera.belongsTo(Moneda, { onDelete: 'CASCADE' });
+Moneda.hasMany(Billetera, { onDelete: 'CASCADE' });
 
-// User ↔ Announcement
-Anuncio.belongsTo(Usuario);
-Usuario.hasMany(Anuncio);
+// Usuario ↔ Anuncio
+Anuncio.belongsTo(Usuario, { onDelete: 'CASCADE' });
+Usuario.hasMany(Anuncio, { onDelete: 'CASCADE' });
 
-// Moneda ↔ Announcement
-Anuncio.belongsTo(Moneda);
-Moneda.hasMany(Anuncio);
+// Moneda ↔ Anuncio
+Anuncio.belongsTo(Moneda, { onDelete: 'CASCADE' });
+Moneda.hasMany(Anuncio, { onDelete: 'CASCADE' });
 
-// Transaction ↔ User (buyer / seller)
-Transaccion.belongsTo(Usuario, { as: 'comprador', foreignKey: 'compradorId' });
-Usuario.hasMany(Transaccion, { foreignKey: 'compradorId', as: 'compras' });
+// Usuario (comprador / vendedor) ↔ Transacción
+Transaccion.belongsTo(Usuario, { as: 'comprador', foreignKey: 'compradorId', onDelete: 'CASCADE' });
+Usuario.hasMany(Transaccion, { foreignKey: 'compradorId', as: 'compras', onDelete: 'CASCADE' });
 
-Transaccion.belongsTo(Usuario, { as: 'vendedor', foreignKey: 'vendedorId' });
-Usuario.hasMany(Transaccion, { foreignKey: 'vendedorId', as: 'ventas' });
+Transaccion.belongsTo(Usuario, { as: 'vendedor', foreignKey: 'vendedorId', onDelete: 'CASCADE' });
+Usuario.hasMany(Transaccion, { foreignKey: 'vendedorId', as: 'ventas', onDelete: 'CASCADE' });
 
-// Transaction ↔ Wallet (from / to)
-Transaccion.belongsTo(Billetera, { as: 'deBilletera', foreignKey: 'deBilleteraId' });
-Billetera.hasMany(Transaccion, { foreignKey: 'deBilleteraId', as: 'deTransferencia' });
+// Billetera (de / hacia) ↔ Transacción
+Transaccion.belongsTo(Billetera, { as: 'deBilletera', foreignKey: 'deBilleteraId', onDelete: 'CASCADE' });
+Billetera.hasMany(Transaccion, { foreignKey: 'deBilleteraId', as: 'deTransferencia', onDelete: 'CASCADE' });
 
-Transaccion.belongsTo(Billetera, { as: 'haciaBilletera', foreignKey: 'haciaBilleteraId' });
-Billetera.hasMany(Transaccion, { foreignKey: 'haciaBilleteraId', as: 'haciaTransferencia' });
+Transaccion.belongsTo(Billetera, { as: 'haciaBilletera', foreignKey: 'haciaBilleteraId', onDelete: 'CASCADE' });
+Billetera.hasMany(Transaccion, { foreignKey: 'haciaBilleteraId', as: 'haciaTransferencia', onDelete: 'CASCADE' });
 
-// Transaction ↔ Announcement
-Transaccion.belongsTo(Anuncio);
-Anuncio.hasMany(Transaccion);
+// Anuncio ↔ Transacción
+Transaccion.belongsTo(Anuncio, { onDelete: 'CASCADE' });
+Anuncio.hasMany(Transaccion, { onDelete: 'CASCADE' });
+
+Token.belongsTo(Usuario, { foreignKey: 'usuarioId', onDelete: 'CASCADE' });
+Usuario.hasMany(Token, { foreignKey: 'usuarioId' });
 
 module.exports = {
   Usuario,
   Moneda,
   Billetera,
   Anuncio,
-  Transaccion
+  Transaccion,
+  Token
 };

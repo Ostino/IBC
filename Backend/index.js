@@ -2,7 +2,9 @@
 const express = require('express');
 const cors = require('cors');
 const app = express();
-const sequelize = require('./config/database'); // Asegúrate de que apunte bien
+const sequelize = require('./config/database');
+const authRoutes = require('./routes/auth.route');
+const userRoutes = require('./routes/user.route');
 
 require('./models'); // Importa modelos para que sequelize.sync() los reconozca
 
@@ -37,5 +39,7 @@ async function iniciarServidor() {
     console.error('❌ Error al conectar con la base de datos:', error);
   }
 }
-
 iniciarServidor();
+
+app.use('/api/auth', authRoutes);
+app.use('/api/usuarios', userRoutes);
