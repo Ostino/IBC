@@ -15,7 +15,7 @@ const requireUser = async (req, res, next) => {
       where: { token: tokenStr },
       include: {
       model: Usuario,
-      attributes: ['id', 'username', 'email']  // opcional, para limitar campos
+      attributes: ['id','rol', 'username', 'email']  // opcional, para limitar campos
       }
     });
 
@@ -23,7 +23,7 @@ const requireUser = async (req, res, next) => {
       return res.status(401).json({ error: 'Token inválido o expirado' });
     }
 
-    req.user = token.Usuario; // 👈 Aquí es donde se guarda el usuario
+    req.user = token.Usuario; 
     next();
   } catch (err) {
     res.status(500).json({ error: 'Error al verificar token', details: err.message });

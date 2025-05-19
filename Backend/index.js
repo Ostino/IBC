@@ -29,12 +29,11 @@ async function iniciarServidor() {
     );
     console.log("📦 Tablas en la base de datos:");
     resultados.forEach(t => console.log(`- ${t.name}`));
-
+    //await asignarAdmin('lucas@email.com');
     const PORT = 3000;
     app.listen(PORT, () => {
       console.log(`🚀 Servidor backend corriendo en http://localhost:${PORT}`);
     });
-
   } catch (error) {
     console.error('❌ Error al conectar con la base de datos:', error);
   }
@@ -43,3 +42,20 @@ iniciarServidor();
 
 app.use('/api/auth', authRoutes);
 app.use('/api/usuarios', userRoutes);
+
+const { Usuario } = require('./models');
+async function asignarAdmin(email) {
+  const usuario = await Usuario.findOne({ where: { email } });
+
+  if (usuario) {
+    if (usuario.rol !== 2) {
+      usuario.rol = 2;
+      await usuario.save();
+      console.log(`✅ El usuario ${usuario.username} ahora es admin (rol 1)`);
+    } else {
+      console.log(`ℹ️ El usuario ${usuario.username} ya es admin`);
+    }
+  } else {
+    console.log('❌ No se encontró el usuario para hacer admin');
+  }
+}

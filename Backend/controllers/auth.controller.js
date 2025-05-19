@@ -17,7 +17,8 @@ const register = async (req, res) => {
       user: {
         id: nuevoUsuario.id,
         username: nuevoUsuario.username,
-        email: nuevoUsuario.email
+        email: nuevoUsuario.email,
+        rol: nuevoUsuario.rol
       }
     });
   } catch (err) {
@@ -44,7 +45,8 @@ const login = async (req, res) => {
       user: {
         id: usuario.id,
         username: usuario.username,
-        email: usuario.email
+        email: usuario.email,
+        rol: usuario.rol
       }
     });
   } catch (err) {

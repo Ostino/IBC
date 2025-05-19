@@ -7,6 +7,11 @@ const Usuario = sequelize.define('Usuario', {
     primaryKey: true,
     autoIncrement: true
   },
+  rol: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    defaultValue: 2
+  },
   username: {
     type: DataTypes.STRING,
     unique: true,

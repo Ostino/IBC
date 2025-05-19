@@ -3,7 +3,7 @@ import Login from "./pages/Login";
 // Las siguientes se agregan después:
 import Register from "./pages/Register";
 import Profile from "./pages/Perfil";
-
+import AdmUsuarios from "./pages/AdmUsuarios";
 export default function App() {
   return (
     <Routes>
@@ -11,6 +11,7 @@ export default function App() {
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
       <Route path="/profile" element={<Profile />} />
+      <Route path="/admUsuarios" element={<AdmUsuarios />} />
     </Routes>
   );
 }

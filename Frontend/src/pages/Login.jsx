@@ -10,9 +10,13 @@ export default function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const { token } = await login(email, password);
+      const { token ,user} = await login(email, password);
       sessionStorage.setItem("token", token);
+      if (user.rol === 1) {
+      navigate("/admUsuarios");
+    } else {
       navigate("/profile");
+    }
     } catch (err) {
       alert("Credenciales inválidas");
     }
