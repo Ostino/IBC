@@ -1,56 +1,46 @@
 import { useState } from "react";
-import { login } from "../services/authService";
 import { useNavigate } from "react-router-dom";
-import Input from "../components/Input";
+import { login } from "../services/authService";
 
 export default function Login() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const navigate = useNavigate();
-  const [formData, setFormData] = useState({ email: "", password: "" });
-  const [error, setError] = useState("");
-
-  const handleChange = (e) => {
-    setFormData((prev) => ({
-      ...prev,
-      [e.target.name]: e.target.value,
-    }));
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError("");
-
     try {
-      const data = await login(formData.email, formData.password);
-      sessionStorage.setItem("token", data.token);
-      // Cuando esté lista la página de perfil:
+      const { token } = await login(email, password);
+      sessionStorage.setItem("token", token);
       navigate("/profile");
     } catch (err) {
-      setError("Credenciales incorrectas");
-      console.error(err);
+      alert("Credenciales inválidas");
     }
   };
 
   return (
     <div style={{ maxWidth: 400, margin: "2rem auto" }}>
-      <h2>Iniciar Sesión</h2>
+      <h2>Login</h2>
       <form onSubmit={handleSubmit}>
-        <Input
-          label="Email"
+        <input
           type="email"
-          name="email"
-          value={formData.email}
-          onChange={handleChange}
+          placeholder="Correo"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
         />
-        <Input
-          label="Contraseña"
+        <input
           type="password"
-          name="password"
-          value={formData.password}
-          onChange={handleChange}
+          placeholder="Contraseña"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
         />
-        <button type="submit">Entrar</button>
-        {error && <p style={{ color: "red" }}>{error}</p>}
+        <button type="submit">Iniciar sesión</button>
       </form>
+      <button onClick={() => navigate("/register")} style={{ marginTop: "1rem" }}>
+        ¿No tienes cuenta? Regístrate
+      </button>
     </div>
   );
 }

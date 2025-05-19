@@ -1,39 +1,21 @@
 import { useState } from "react";
-import { register } from "../services/authService";
 import { useNavigate } from "react-router-dom";
-import Input from "../components/Input";
+import { register } from "../services/authService";
 
 export default function Register() {
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const navigate = useNavigate();
-  const [formData, setFormData] = useState({
-    username: "",
-    email: "",
-    password: "",
-  });
-  const [error, setError] = useState("");
-
-  const handleChange = (e) => {
-    setFormData((prev) => ({
-      ...prev,
-      [e.target.name]: e.target.value,
-    }));
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError("");
-
     try {
-      const data = await register(
-        formData.username,
-        formData.email,
-        formData.password
-      );
-      sessionStorage.setItem("token", data.token);
-      navigate("/profile"); // Redirige a perfil una vez esté lista
+      const { token } = await register(username, email, password);
+      sessionStorage.setItem("token", token);
+      navigate("/profile");
     } catch (err) {
-      setError("No se pudo registrar. Verifica los datos.");
-      console.error(err);
+      alert("Error al registrar usuario");
     }
   };
 
@@ -41,30 +23,32 @@ export default function Register() {
     <div style={{ maxWidth: 400, margin: "2rem auto" }}>
       <h2>Registro</h2>
       <form onSubmit={handleSubmit}>
-        <Input
-          label="Usuario"
+        <input
           type="text"
-          name="username"
-          value={formData.username}
-          onChange={handleChange}
+          placeholder="Usuario"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+          required
         />
-        <Input
-          label="Email"
+        <input
           type="email"
-          name="email"
-          value={formData.email}
-          onChange={handleChange}
+          placeholder="Correo"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
         />
-        <Input
-          label="Contraseña"
+        <input
           type="password"
-          name="password"
-          value={formData.password}
-          onChange={handleChange}
+          placeholder="Contraseña"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
         />
         <button type="submit">Registrarse</button>
-        {error && <p style={{ color: "red" }}>{error}</p>}
       </form>
+      <button onClick={() => navigate("/login")} style={{ marginTop: "1rem" }}>
+        ¿Ya tienes cuenta? Inicia sesión
+      </button>
     </div>
   );
 }
