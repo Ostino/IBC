@@ -15,11 +15,6 @@ const Transaccion = sequelize.define('Transaccion', {
     type: DataTypes.FLOAT, 
     allowNull: false 
     },
-  estatus: { 
-    type: DataTypes.ENUM('PENDIENTE', 'FINALIZADA', 'CANCELADA'),
-    defaultValue: 'PENDIENTE',
-    allowNull: false
-    },
   descripcionPago: { type: DataTypes.STRING },
   comprobantePago: { type: DataTypes.STRING }, // Imagen o texto del comprobante
 });
