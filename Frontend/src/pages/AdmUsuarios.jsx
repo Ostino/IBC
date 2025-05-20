@@ -65,6 +65,7 @@ const handleLogoutAll = async () => {
         ))}
       </ul>
         <button onClick={() => handleLogoutAll()}>Cerrar todas las sesiones</button>
+        <button onClick={() => navigate("/admMonedas")}>Crud Monedas</button>                      
     </div>
   );
 };

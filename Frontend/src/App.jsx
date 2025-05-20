@@ -4,6 +4,7 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Profile from "./pages/Perfil";
 import AdmUsuarios from "./pages/AdmUsuarios";
+import AdmMonedas from "./pages/AdmMonenda";
 export default function App() {
   return (
     <Routes>
@@ -12,6 +13,7 @@ export default function App() {
       <Route path="/register" element={<Register />} />
       <Route path="/profile" element={<Profile />} />
       <Route path="/admUsuarios" element={<AdmUsuarios />} />
+      <Route path="/admMonedas" element={<AdmMonedas />} />
     </Routes>
   );
 }

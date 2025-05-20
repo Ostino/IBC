@@ -5,6 +5,7 @@ const app = express();
 const sequelize = require('./config/database');
 const authRoutes = require('./routes/auth.route');
 const userRoutes = require('./routes/user.route');
+const monedaRoutes = require('./routes/moneda.route');
 
 require('./models'); // Importa modelos para que sequelize.sync() los reconozca
 
@@ -42,9 +43,10 @@ iniciarServidor();
 
 app.use('/api/auth', authRoutes);
 app.use('/api/usuarios', userRoutes);
+app.use('/api/monedas', monedaRoutes);
 
-const { Usuario } = require('./models');
-async function asignarAdmin(email) {
+//const { Usuario } = require('./models');
+/*async function asignarAdmin(email) {
   const usuario = await Usuario.findOne({ where: { email } });
 
   if (usuario) {
@@ -58,4 +60,4 @@ async function asignarAdmin(email) {
   } else {
     console.log('❌ No se encontró el usuario para hacer admin');
   }
-}
+}*/

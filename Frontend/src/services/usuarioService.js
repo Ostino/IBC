@@ -19,10 +19,6 @@ export const getAllUsers = async (token) => {
   return response.data;
 };
 export const promoteToAdmin = async (id, token) => {
-  console.log("Promoviendo usuario ID:", id);
-  console.log("Usando token:", token);
-  console.log("URL:", `${API_URL}/admin/${id}`);
-
   try {
     const response = await axios.put(`${API_URL}/admin/${id}`, {}, {
       headers: {
