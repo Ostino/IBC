@@ -7,12 +7,12 @@ const Token = require('./token.model')
 // Relaciones
 
 // Usuario ↔ Billetera
-Billetera.belongsTo(Usuario, { onDelete: 'CASCADE' });
-Usuario.hasMany(Billetera, { onDelete: 'CASCADE' });
+Billetera.belongsTo(Usuario, { foreignKey: 'usuarioId', onDelete: 'CASCADE' });
+Usuario.hasMany(Billetera, { foreignKey: 'usuarioId', onDelete: 'CASCADE' });
 
 // Moneda ↔ Billetera
-Billetera.belongsTo(Moneda, { onDelete: 'CASCADE' });
-Moneda.hasMany(Billetera, { onDelete: 'CASCADE' });
+Billetera.belongsTo(Moneda, { foreignKey: 'monedaId', onDelete: 'CASCADE' });
+Moneda.hasMany(Billetera, { foreignKey: 'monedaId', onDelete: 'CASCADE' });
 
 // Usuario ↔ Anuncio
 Anuncio.belongsTo(Usuario, { onDelete: 'CASCADE' });

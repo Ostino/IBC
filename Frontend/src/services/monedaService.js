@@ -3,7 +3,7 @@ import axios from "axios";
 const API_URL = "http://localhost:3000/api/monedas";
 
 export const getAllMonedas = async (token) => {
-  const response = await axios.get(`${API_URL}/`, {
+  const response = await axios.get(API_URL, {
     headers: {
       Authorization: `Bearer ${token}`,
     },

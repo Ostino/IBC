@@ -2,34 +2,54 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getProfile } from "../services/usuarioService";
 import { logout, logoutAll } from "../services/authService";
+import { getAllMonedas } from "../services/monedaService";
+import { getBilletera } from "../services/billeteraService";
 
 export default function Profile() {
   const [user, setUser] = useState(null);
+  const [monedas, setMonedas] = useState([]);
+  const [billeteras, setBilleteras] = useState([]);
   const navigate = useNavigate();
 
   const token = sessionStorage.getItem("token");
 
   useEffect(() => {
-    const fetchProfile = async () => {
+    const fetchData = async () => {
       if (!token) {
         navigate("/login");
         return;
       }
 
       try {
-        const data = await getProfile(token);
-        setUser(data);
+        const userData = await getProfile(token);
+        setUser(userData);
+
+        const [todasMonedas, billeterasUsuario] = await Promise.all([
+          getAllMonedas(token),
+          getBilletera(token),
+        ]);
+
+        const billeterasConMoneda = billeterasUsuario.map((billetera) => {
+          const moneda = todasMonedas.find((m) => m.id === billetera.monedaId);
+          return {
+            ...billetera,
+            moneda,
+          };
+        });
+
+        setMonedas(todasMonedas);
+        setBilleteras(billeterasConMoneda);
       } catch (err) {
         if (err.response?.status === 401) {
           sessionStorage.removeItem("token");
           navigate("/login");
         } else {
-          console.error("Error al obtener el perfil:", err);
+          console.error("Error al cargar datos del perfil:", err);
         }
       }
     };
 
-    fetchProfile();
+    fetchData();
   }, [navigate, token]);
 
   const handleLogout = async () => {
@@ -57,7 +77,7 @@ export default function Profile() {
   if (!user) return <p>Cargando perfil...</p>;
 
   return (
-    <div style={{ maxWidth: 400, margin: "2rem auto" }}>
+    <div style={{ maxWidth: 600, margin: "2rem auto" }}>
       <h2>Perfil</h2>
       <p><strong>ID:</strong> {user.id}</p>
       <p><strong>Usuario:</strong> {user.username}</p>
@@ -68,6 +88,33 @@ export default function Profile() {
           Cerrar sesión
         </button>
         <button onClick={handleLogoutAll}>Cerrar todas las sesiones</button>
+      </div>
+
+      <div style={{ marginTop: "2rem" }}>
+        <h3>Mis Billeteras</h3>
+        {billeteras.length === 0 ? (
+          <p>No tienes billeteras.</p>
+        ) : (
+          <ul>
+            {billeteras.map((b) => (
+              <li key={b.id}>
+                <strong>{b.moneda.nombre}</strong> - Saldo: {b.saldo}
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+
+      <div style={{ marginTop: "2rem" }}>
+        <h3>Monedas disponibles</h3>
+        <ul>
+          {monedas.map((moneda) => (
+            <li key={moneda.id}>
+              {billeteras.some((b) => b.moneda.id === moneda.id) ? "✔ " : ""}
+              {moneda.codigo} - {moneda.nombre} (Valor: {moneda.valueInSus} SUS)
+            </li>
+          ))}
+        </ul>
       </div>
     </div>
   );

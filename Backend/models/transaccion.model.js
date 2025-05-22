@@ -15,7 +15,11 @@ const Transaccion = sequelize.define('Transaccion', {
     type: DataTypes.FLOAT, 
     allowNull: false 
     },
-  descripcionPago: { type: DataTypes.STRING },
-  comprobantePago: { type: DataTypes.STRING }, // Imagen o texto del comprobante
+  descripcionPago: { 
+    type: DataTypes.STRING 
+    },
+  comprobantePago: { 
+    type: DataTypes.STRING 
+    }, // Imagen o texto del comprobante
 });
 module.exports = Transaccion;
