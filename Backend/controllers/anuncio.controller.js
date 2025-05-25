@@ -1,9 +1,9 @@
 const Anuncio = require('../models/anuncio.model');
 const fs = require('fs');
 const path = require('path');
-
+//    const usuarioId = req.user.id;
 // Crear anuncio
-const crearAnuncio = async (req, res) => {
+/*const crearAnuncio = async (req, res) => {
   try {
     const { monedaId, tipo, precioPorUnidad, cantidad, descripcionPago, divisa } = req.body;  // agregar divisa
     const usuarioId = req.user.id;
@@ -22,8 +22,41 @@ const crearAnuncio = async (req, res) => {
   } catch (error) {
     res.status(500).json({ error: 'Error al crear anuncio', details: error.message });
   }
-};
+};*/
+const crearAnuncio = async (req, res) => {
+  try {
+    const { monedaId, tipo, precioPorUnidad, cantidad, descripcionPago,divisa } = req.body;
+    const usuarioId = req.user.id;
+    // Crear el anuncio inicialmente sin imagen
+    const anuncio = await Anuncio.create({
+      UsuarioId: usuarioId,
+      MonedaId: monedaId,
+      tipo,
+      precioPorUnidad,
+      cantidad,
+      descripcionPago,
+      divisa,
+      imagenPago: null // Se asigna luego si hay imagen
+    });
 
+    // Si hay archivo subido (imagen), renombrarlo y guardar la ruta
+    if (req.file) {
+      const ext = path.extname(req.file.originalname);
+      const nuevoNombre = `${anuncio.id}_${path.basename(req.file.originalname, ext)}${ext}`;
+      const nuevoPath = path.join(req.file.destination, nuevoNombre);
+
+      fs.renameSync(req.file.path, nuevoPath);
+
+      // ⬇️ Solo guarda el nombre del archivo, no la ruta completa
+      anuncio.imagenPago = nuevoNombre;
+      await anuncio.save();
+    }
+
+    res.status(201).json(anuncio);
+  } catch (error) {
+    res.status(500).json({ error: 'Error al crear anuncio', details: error.message });
+  }
+};
 
 // Obtener todos los anuncios del usuario
 const obtenerAnuncios = async (req, res) => {

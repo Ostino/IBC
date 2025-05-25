@@ -88,8 +88,11 @@ export default function Profile() {
           Cerrar sesión
         </button>
         <button onClick={handleLogoutAll}>Cerrar todas las sesiones</button>
+        <button onClick={() => navigate("/registrar-anuncio")}>
+        Registrar anuncio
+        </button>
       </div>
-
+          
       <div style={{ marginTop: "2rem" }}>
         <h3>Mis Billeteras</h3>
         {billeteras.length === 0 ? (

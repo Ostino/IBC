@@ -1,6 +1,7 @@
 // index.js
 const express = require('express');
 const cors = require('cors');
+const path = require('path');
 const app = express();
 const sequelize = require('./config/database');
 const authRoutes = require('./routes/auth.route');
@@ -48,7 +49,7 @@ app.use('/api/usuarios', userRoutes);
 app.use('/api/monedas', monedaRoutes);
 app.use('/api/anuncios', anuncioRoutes);
 app.use('/api/billeteras', billeteraRoutes);
-
+app.use('/ImagenesAnuncios', express.static(path.join(__dirname, 'ImagenesAnuncios')));
 
 
 

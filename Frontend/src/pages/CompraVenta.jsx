@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { getAnunciosPorMonedaYTipo } from "../services/compraVentaService";
+import { obtenerUrlImagenPago } from "../services/imgeneService";
 
 export default function CompraVenta() {
-  const { idMoneda } = useParams(); // Este debe venir del <Route path="/compraventa/:idMoneda" />
+  const { idMoneda } = useParams();
   const [tipoSeleccionado, setTipoSeleccionado] = useState("compra");
   const [anuncios, setAnuncios] = useState([]);
   const token = sessionStorage.getItem("token");
@@ -26,17 +27,22 @@ export default function CompraVenta() {
   return (
     <div style={{ maxWidth: 800, margin: "2rem auto", padding: "1rem" }}>
       <h2>Anuncios para moneda #{idMoneda}</h2>
-      
+
       <div style={{ marginBottom: "1rem" }}>
         <button
           onClick={() => setTipoSeleccionado("compra")}
-          style={{ marginRight: "1rem", backgroundColor: tipoSeleccionado === "compra" ? "#d3f9d8" : "#eee" }}
+          style={{
+            marginRight: "1rem",
+            backgroundColor: tipoSeleccionado === "compra" ? "#d3f9d8" : "#eee"
+          }}
         >
           Compra
         </button>
         <button
           onClick={() => setTipoSeleccionado("venta")}
-          style={{ backgroundColor: tipoSeleccionado === "venta" ? "#ffd6d6" : "#eee" }}
+          style={{
+            backgroundColor: tipoSeleccionado === "venta" ? "#ffd6d6" : "#eee"
+          }}
         >
           Venta
         </button>
@@ -47,15 +53,27 @@ export default function CompraVenta() {
       ) : (
         <div>
           {anuncios.map((anuncio) => (
-            <div key={anuncio.id} style={{
-              border: "1px solid #ccc",
-              borderRadius: "8px",
-              padding: "1rem",
-              marginBottom: "1rem"
-            }}>
+            <div
+              key={anuncio.id}
+              style={{
+                border: "1px solid #ccc",
+                borderRadius: "8px",
+                padding: "1rem",
+                marginBottom: "1rem"
+              }}
+            >
               <p><strong>Precio por unidad:</strong> {anuncio.precioPorUnidad}</p>
               <p><strong>Cantidad:</strong> {anuncio.cantidad}</p>
               <p><strong>Divisa:</strong> {anuncio.divisa}</p>
+              
+              {anuncio.imagenPago ? (
+                <div style={{ marginTop: "1rem" }}>
+                  <p><strong>Comprobante de pago:</strong></p>
+                  <img src={obtenerUrlImagenPago(anuncio.imagenPago)}
+                  alt="Comprobante de pago"
+                  style={{ width: "100%", maxWidth: "300px", borderRadius: "4px" }}/>
+                </div>
+                ) : null}
             </div>
           ))}
         </div>
