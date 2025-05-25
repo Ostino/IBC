@@ -19,6 +19,11 @@ const Anuncio = sequelize.define('Anuncio', {
     type: DataTypes.FLOAT, 
     allowNull: false 
     },
+    disponible: {
+    type: DataTypes.BOOLEAN,
+    allowNull: false,
+    defaultValue: true // Por defecto está disponible
+    },
   descripcionPago: { 
     type: DataTypes.TEXT 
     },  // Texto explicando método de pago

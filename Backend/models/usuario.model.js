@@ -5,7 +5,8 @@ const Usuario = sequelize.define('Usuario', {
   id: {
     type: DataTypes.INTEGER,
     primaryKey: true,
-    autoIncrement: true
+    autoIncrement: true,
+    allowNull: false,//
   },
   rol: {
     type: DataTypes.INTEGER,

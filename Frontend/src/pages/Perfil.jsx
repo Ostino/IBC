@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { getProfile } from "../services/usuarioService";
 import { logout, logoutAll } from "../services/authService";
 import { getAllMonedas } from "../services/monedaService";
@@ -110,8 +110,10 @@ export default function Profile() {
         <ul>
           {monedas.map((moneda) => (
             <li key={moneda.id}>
-              {billeteras.some((b) => b.moneda.id === moneda.id) ? "✔ " : ""}
-              {moneda.codigo} - {moneda.nombre} (Valor: {moneda.valueInSus} SUS)
+              <Link to={`/compraventa/${moneda.id}`} style={{ textDecoration: "none", color: "#0077cc" }}>
+                {billeteras.some((b) => b.moneda.id === moneda.id) ? "✔ " : ""}
+                {moneda.codigo} - {moneda.nombre} (Valor: {moneda.valueInSus} SUS)
+              </Link>
             </li>
           ))}
         </ul>
