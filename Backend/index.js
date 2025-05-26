@@ -25,7 +25,7 @@ async function iniciarServidor() {
     await sequelize.authenticate();
     console.log('✅ Conexión exitosa a la base de datos');
 
-    //await sequelize.sync({ alter: true }); // Usamos alter para actualizar sin borrar dato
+    await sequelize.sync({ alter: true }); // Usamos alter para actualizar sin borrar dato
     console.log('✅ Tablas sincronizadas correctamente');
 
     const [resultados] = await sequelize.query(

@@ -24,7 +24,7 @@ export default function CompraVentaDetalle() {
       console.log(anuncio.id,"anuncio id ", token, "token")
       await crearTransferencia(anuncio.id, comprobante, token);
       alert("Transacción realizada con éxito.");
-      navigate("/perfil");
+      navigate("/profile");
     } catch (error) {
       console.error("Error en la transacción:", error);
       alert("Hubo un error al realizar la transacción.");

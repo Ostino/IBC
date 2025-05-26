@@ -58,7 +58,7 @@ const crearTransferencia = async (req, res) => {
 
 
     const nuevaTransferencia = await Transaccion.create({
-      anuncioId,
+      AnuncioId :anuncioId,
       vendedorId,
       compradorId,
       monto,
@@ -92,9 +92,7 @@ const crearTransferencia = async (req, res) => {
 };
 const getTodasLasTransferencias = async (req, res) => {
   try {
-    const transferencias = await Transaccion.findAll({
-      include: ['anuncio', 'deBilletera', 'haciaBilletera']
-    });
+    const transferencias = await Transaccion.findAll({model: Usuario});
     res.json(transferencias);
   } catch (error) {
     console.error('Error al obtener transferencias:', error);

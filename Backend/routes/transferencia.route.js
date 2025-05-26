@@ -6,7 +6,7 @@ const requireUser = require('../middlewares/requiredUser');
 
 router.post('/crear', requireUser, upload.single('comprobante'), transaccionController.crearTransferencia);
 
-router.get('/todas', transaccionController.getTodasLasTransferencias);
+router.get('/todas',requireUser, transaccionController.getTodasLasTransferencias);
 router.get('/mias', requireUser, transaccionController.getMisTransferencias);
 router.get('/usuario/:id', transaccionController.getTransferenciasPorUsuario);
 
