@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { getAnunciosPorMonedaYTipo } from "../services/compraVentaService";
 import { obtenerUrlImagenPago } from "../services/imgeneService";
 
@@ -8,8 +9,13 @@ export default function CompraVenta() {
   const [tipoSeleccionado, setTipoSeleccionado] = useState("compra");
   const [anuncios, setAnuncios] = useState([]);
   const token = sessionStorage.getItem("token");
+  const navigate = useNavigate();
 
   useEffect(() => {
+     if (!token) {
+        navigate("/login");
+        return;
+      }
     const cargarAnuncios = async () => {
       try {
         const data = await getAnunciosPorMonedaYTipo(idMoneda, tipoSeleccionado, token);
@@ -65,12 +71,18 @@ export default function CompraVenta() {
               <p><strong>Precio por unidad:</strong> {anuncio.precioPorUnidad}</p>
               <p><strong>Cantidad:</strong> {anuncio.cantidad}</p>
               <p><strong>Divisa:</strong> {anuncio.divisa}</p>
-              
+              <button
+  onClick={() => navigate("/compraventa-detalle", { state: { anuncio } })}
+  style={{ marginTop: "0.5rem" }}
+>
+  Ver Detalle
+</button>
+
               {anuncio.imagenPago ? (
                 <div style={{ marginTop: "1rem" }}>
-                  <p><strong>Comprobante de pago:</strong></p>
+                  <p><strong>Como pagar:</strong></p>
                   <img src={obtenerUrlImagenPago(anuncio.imagenPago)}
-                  alt="Comprobante de pago"
+                  alt="Como pagar"
                   style={{ width: "100%", maxWidth: "300px", borderRadius: "4px" }}/>
                 </div>
                 ) : null}

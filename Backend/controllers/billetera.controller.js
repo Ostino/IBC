@@ -35,7 +35,7 @@ const obtenerBilleteras = async (_req, res) => {
 };
 
 // 3. Obtener una billetera por ID
-const obtenerBilleteraPorId = async (req, res) => {
+const obtenerBilleterasDelUsuario = async (req, res) => {
   try {
     const { id } = req.params;
     const billetera = await Billetera.findByPk(id);
@@ -76,10 +76,10 @@ const eliminarBilletera = async (req, res) => {
   }
 };
 
-const obtenerBilleterasPorUsuarioId = async (req, res) => {
+const obtenerBilleterasDelUsuarioMe = async (req, res) => {
   try {
-    const { usuarioId } = req.params;
-    const billeteras = await Billetera.findAll({ where: { usuarioId } });
+    const usuarioId = req.user.id;
+    const billeteras = await Billetera.findAll({  where: { usuarioId:usuarioId  } });
 
     res.json(billeteras);
   } catch (err) {
@@ -89,8 +89,8 @@ const obtenerBilleterasPorUsuarioId = async (req, res) => {
 module.exports = {
   crearBilletera,
   obtenerBilleteras,
-  obtenerBilleteraPorId,
   actualizarBilletera,
   eliminarBilletera,
-  obtenerBilleterasPorUsuarioId
+  obtenerBilleterasDelUsuarioMe,
+  obtenerBilleterasDelUsuario
 };

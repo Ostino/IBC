@@ -3,7 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { getProfile } from "../services/usuarioService";
 import { logout, logoutAll } from "../services/authService";
 import { getAllMonedas } from "../services/monedaService";
-import { getBilletera } from "../services/billeteraService";
+import { getBilleterasConMonedaUser } from "../services/billeteraService";
 
 export default function Profile() {
   const [user, setUser] = useState(null);
@@ -26,7 +26,7 @@ export default function Profile() {
 
         const [todasMonedas, billeterasUsuario] = await Promise.all([
           getAllMonedas(token),
-          getBilletera(token),
+          getBilleterasConMonedaUser(token),
         ]);
 
         const billeterasConMoneda = billeterasUsuario.map((billetera) => {

@@ -7,6 +7,7 @@ import AdmUsuarios from "./pages/AdmUsuarios";
 import AdmMonedas from "./pages/AdmMonenda";
 import RegistrarAnuncio from "./pages/RegisAnuncio";
 import CompraVenta from "./pages/CompraVenta";
+import CompraVentaDetalle from "./pages/CVDetalle";
 export default function App() {
   return (
     <Routes>
@@ -18,6 +19,7 @@ export default function App() {
       <Route path="/admMonedas" element={<AdmMonedas />} />
       <Route path="/registrar-anuncio" element={<RegistrarAnuncio />} />
       <Route path="/compraventa/:idMoneda" element={<CompraVenta />} />
+      <Route path="/compraventa-detalle" element={<CompraVentaDetalle />} />
     </Routes>
   );
 }

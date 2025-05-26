@@ -19,7 +19,7 @@ const Anuncio = sequelize.define('Anuncio', {
     type: DataTypes.FLOAT, 
     allowNull: false 
     },
-    disponible: {
+  disponible: {
     type: DataTypes.BOOLEAN,
     allowNull: false,
     defaultValue: true // Por defecto está disponible
