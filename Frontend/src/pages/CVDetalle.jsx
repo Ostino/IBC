@@ -1,6 +1,6 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import { useState } from "react";
-import { crearTransferencia } from "../services/transferenciaService";
+import { crearTransaccion } from "../services/transaccionService";
 export default function CompraVentaDetalle() {
   const { state } = useLocation(); // el anuncio se pasa desde navigate con state
   const anuncio = state?.anuncio;
@@ -22,7 +22,7 @@ export default function CompraVentaDetalle() {
 
     try {
       console.log(anuncio.id,"anuncio id ", token, "token")
-      await crearTransferencia(anuncio.id, comprobante, token);
+      await crearTransaccion(anuncio.id, comprobante, token);
       alert("Transacción realizada con éxito.");
       navigate("/profile");
     } catch (error) {

@@ -1,6 +1,7 @@
 const { Transaccion, Anuncio, Billetera, Usuario } = require('../models');
 const fs = require('fs');
 const path = require('path');
+const { Op } = require('sequelize');
 
 const getBilleteraDelUsuarioPorMoneda = async (usuarioId, monedaId) => {
   const billeteras = await Billetera.findAll({
@@ -15,6 +16,58 @@ const getBilleteraDelUsuarioPorMoneda = async (usuarioId, monedaId) => {
   }
 
   return billeteraEncontrada;
+};
+
+const buscarTransaccionPorId = async (id) => {
+  try {
+    const transaccion = await Transaccion.findByPk(id, {
+      include: [
+        { model: Anuncio },
+        { model: Billetera, as: 'deBilletera' },
+        { model: Billetera, as: 'haciaBilletera' },
+        { model: Usuario, as: 'comprador' },
+        { model: Usuario, as: 'vendedor' }
+      ]
+    });
+
+    return transaccion; // Retorna null si no existe
+  } catch (error) {
+    console.error('❌ Error al buscar transacción por ID:', error);
+    throw error;
+  }
+};
+
+const hacerTransaccion = async (transaccion) => {
+  const monto = transaccion.monto;
+
+  const billeteraOrigen = transaccion.deBilletera;
+  const billeteraDestino = transaccion.haciaBilletera;
+
+  // Verifica que ambas billeteras existan
+  if (!billeteraOrigen || !billeteraDestino) {
+    throw new Error('Faltan datos de billetera para realizar la transacción.');
+  }
+
+  // Verifica saldo suficiente
+  if (billeteraOrigen.saldo < monto) {
+    throw new Error('Saldo insuficiente en la billetera de origen.');
+  }
+
+  // Realiza la operación
+  billeteraOrigen.saldo -= monto;
+  billeteraDestino.saldo += monto;
+
+  // Guarda los cambios
+  await Promise.all([
+    billeteraOrigen.save(),
+    billeteraDestino.save()
+  ]);
+
+  return {
+    mensaje: 'Transacción realizada con éxito',
+    deBilletera: billeteraOrigen,
+    haciaBilletera: billeteraDestino
+  };
 };
 
 const crearTransferencia = async (req, res) => {
@@ -90,6 +143,7 @@ const crearTransferencia = async (req, res) => {
     res.status(500).json({ error: 'Error al crear transferencia', details: error.message });
   }
 };
+
 const getTodasLasTransferencias = async (req, res) => {
   try {
     const transferencias = await Transaccion.findAll({model: Usuario});
@@ -99,6 +153,7 @@ const getTodasLasTransferencias = async (req, res) => {
     res.status(500).json({ error: 'Error al obtener transferencias' });
   }
 };
+
 const getMisTransferencias = async (req, res) => {
   try {
     const userId = req.user.id;
@@ -110,7 +165,7 @@ const getMisTransferencias = async (req, res) => {
           { vendedorId: userId }
         ]
       },
-      include: ['anuncio', 'deBilletera', 'haciaBilletera']
+      include: ['Anuncio', 'deBilletera', 'haciaBilletera']
     });
 
     res.json(transferencias);
@@ -119,6 +174,7 @@ const getMisTransferencias = async (req, res) => {
     res.status(500).json({ error: 'Error al obtener tus transferencias' });
   }
 };
+
 const getTransferenciasPorUsuario = async (req, res) => {
   try {
     const { id } = req.params;
@@ -140,9 +196,95 @@ const getTransferenciasPorUsuario = async (req, res) => {
   }
 };
 
+const getTransaccionPorId = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const transaccion = await Transaccion.findByPk(id, {
+      include: [
+        { model: Anuncio },
+        { model: Billetera, as: 'deBilletera' },
+        { model: Billetera, as: 'haciaBilletera' },
+        { model: Usuario, as: 'comprador' },
+        { model: Usuario, as: 'vendedor' }
+      ]
+    });
+
+    if (!transaccion) {
+      return res.status(404).json({ error: 'Transacción no encontrada' });
+    }
+
+    res.json(transaccion);
+  } catch (error) {
+    console.error('❌ Error al obtener la transacción:', error);
+    res.status(500).json({ error: 'Error al obtener la transacción' });
+  }
+};
+
+const aprobarTransaccion = async (req, res) => {
+  try {
+    console.log(req.params)
+    const { id } = req.params;
+    const transaccion = await buscarTransaccionPorId(id);
+    //console.log("esta es la transaccion ",transaccion)
+    if (!transaccion) {
+      return res.status(404).json({ error: 'Transacción no encontrada' });
+    }
+        console.log(transaccion.estado," este es el estado de la transaccion")
+
+    if (transaccion.estado !== 'Pendiente') {
+      return res.status(400).json({ error: 'La transacción ya fue procesada' });
+    }
+
+    // Ejecutar la transferencia de saldos
+    await hacerTransaccion(transaccion);
+
+    // Marcar la transacción como aprobada
+    transaccion.estado = 'ACEPTADO';
+    await transaccion.save();
+
+    res.json({ mensaje: 'Transacción aprobada y ejecutada con éxito', transaccion });
+  } catch (error) {
+    console.error('❌ Error al aprobar transacción:', error);
+    res.status(500).json({ error: error.message });
+  }
+};
+
+const cancelarTransaccion = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const transaccion = await Transaccion.findByPk(id);
+
+    if (!transaccion) {
+      return res.status(404).json({ error: 'Transacción no encontrada' });
+    }
+
+    transaccion.estado = 'CANCELADO';
+    await transaccion.save();
+
+    res.json({ message: 'Transacción cancelada correctamente', transaccion });
+  } catch (error) {
+    console.error('Error al cancelar transacción:', error);
+    res.status(500).json({ error: 'Error al cancelar la transacción' });
+  }
+};
+
 module.exports = {
   crearTransferencia,
   getMisTransferencias,
   getTodasLasTransferencias,
-  getTransferenciasPorUsuario
+  getTransferenciasPorUsuario,
+  aprobarTransaccion,
+  cancelarTransaccion,
+  getTransaccionPorId
+};
+module.exports = {
+  crearTransferencia,
+  getMisTransferencias,
+  getTodasLasTransferencias,
+  getTransferenciasPorUsuario,
+  aprobarTransaccion,
+  cancelarTransaccion,
+  getTransaccionPorId
 };

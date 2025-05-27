@@ -8,6 +8,11 @@ router.post('/crear', requireUser, upload.single('comprobante'), transaccionCont
 
 router.get('/todas',requireUser, transaccionController.getTodasLasTransferencias);
 router.get('/mias', requireUser, transaccionController.getMisTransferencias);
+
+router.patch('/transacciones/:id/aprobar', requireUser, transaccionController.aprobarTransaccion);
+router.patch('/transacciones/:id/cancelar', requireUser, transaccionController.cancelarTransaccion);
+router.get('/transacciones/:id', requireUser, transaccionController.getTransaccionPorId);
+
 router.get('/usuario/:id', transaccionController.getTransferenciasPorUsuario);
 
 module.exports = router;

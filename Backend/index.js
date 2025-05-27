@@ -9,7 +9,7 @@ const userRoutes = require('./routes/user.route');
 const monedaRoutes = require('./routes/moneda.route');
 const anuncioRoutes = require('./routes/anuncio.route');
 const billeteraRoutes = require('./routes/billetera.route');
-const transferenciasRoutes = require('./routes/transferencia.route');
+const transaccionRoutes = require('./routes/transaccion.route');
 
 require('./models'); // Importa modelos para que sequelize.sync() los reconozca
 
@@ -25,7 +25,7 @@ async function iniciarServidor() {
     await sequelize.authenticate();
     console.log('✅ Conexión exitosa a la base de datos');
 
-    await sequelize.sync({ alter: true }); // Usamos alter para actualizar sin borrar dato
+    //await sequelize.sync({ alter: true }); // Usamos alter para actualizar sin borrar dato
     console.log('✅ Tablas sincronizadas correctamente');
 
     const [resultados] = await sequelize.query(
@@ -50,8 +50,8 @@ app.use('/api/monedas', monedaRoutes);
 app.use('/api/anuncios', anuncioRoutes);
 app.use('/api/billeteras', billeteraRoutes);
 app.use('/ImagenesAnuncios', express.static(path.join(__dirname, 'ImagenesAnuncios')));
-app.use('/api/transferencias', transferenciasRoutes);
-app.use('/ImagenesComprobantes', express.static(path.join(__dirname, 'ImagenesComprobantes')));
+app.use('/api/transacciones', transaccionRoutes);
+app.use('/ImagenesComprobantes', express.static(path.join(__dirname, 'ImagenesComprobante')));
 
 const { Usuario } = require('./models');
 async function asignarAdmin(email) {

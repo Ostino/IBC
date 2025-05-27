@@ -87,9 +87,14 @@ export default function Profile() {
         <button onClick={handleLogout} style={{ marginRight: "1rem" }}>
           Cerrar sesión
         </button>
-        <button onClick={handleLogoutAll}>Cerrar todas las sesiones</button>
+        <button onClick={handleLogoutAll}>
+          Cerrar todas las sesiones
+        </button>
         <button onClick={() => navigate("/registrar-anuncio")}>
         Registrar anuncio
+        </button>
+        <button onClick={() => navigate("/transacciones")}>
+        Ver transacciones
         </button>
       </div>
           
