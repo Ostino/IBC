@@ -9,6 +9,7 @@ import RegistrarAnuncio from "./pages/RegisAnuncio";
 import CompraVenta from "./pages/CompraVenta";
 import CompraVentaDetalle from "./pages/CVDetalle";
 import Transacciones from "./pages/Transacciones";
+import CrearBilletera from "./pages/CrearBilletera";
 export default function App() {
   return (
     <Routes>
@@ -22,6 +23,7 @@ export default function App() {
       <Route path="/compraventa/:idMoneda" element={<CompraVenta />} />
       <Route path="/compraventa-detalle" element={<CompraVentaDetalle />} />
       <Route path="/transacciones" element={<Transacciones />} />
+      <Route path="/crear-billetera" element={<CrearBilletera />} />
     </Routes>
   );
 }

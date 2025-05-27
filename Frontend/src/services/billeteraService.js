@@ -13,3 +13,16 @@ export const getBilleterasConMonedaUser = async (token) => {
   });
   return response.data;
 };
+
+export const crearBilletera = async (monedaId, saldo, token) => {
+  const response = await axios.post(
+    BILLETERAS_URL,
+    { monedaId, saldo },
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return response.data;
+};

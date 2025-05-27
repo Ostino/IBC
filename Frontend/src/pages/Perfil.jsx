@@ -90,6 +90,9 @@ export default function Profile() {
         <button onClick={handleLogoutAll}>
           Cerrar todas las sesiones
         </button>
+        <button onClick={() => navigate("/crear-billetera")}>
+        Crear billetera
+        </button>
         <button onClick={() => navigate("/registrar-anuncio")}>
         Registrar anuncio
         </button>

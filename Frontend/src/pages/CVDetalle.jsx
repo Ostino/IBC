@@ -7,7 +7,10 @@ export default function CompraVentaDetalle() {
   const [comprobante, setComprobante] = useState(null);
   const token = sessionStorage.getItem("token");
   const navigate = useNavigate();
-
+  if (!token) {
+      navigate("/login");
+      return;
+    }
   if (!anuncio) return <p>No se encontró el anuncio.</p>;
 
   const handleFileChange = (e) => {

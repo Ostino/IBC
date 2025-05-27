@@ -1,11 +1,16 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { getMisTransferencias ,aprobarTransaccion,rechazarTransaccion } from "../services/transaccionService";
 import { obtenerUrlImagenComprobante } from "../services/imgeneService";
 
 export default function Transacciones() {
   const [transferencias, setTransferencias] = useState([]);
+  const navigate = useNavigate();
   const token = sessionStorage.getItem("token");
-
+if (!token) {
+      navigate("/login");
+      return;
+    }
   const cargarTransferencias = async () => {
     try {
       const data = await getMisTransferencias(token);

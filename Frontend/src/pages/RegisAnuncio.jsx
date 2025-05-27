@@ -53,7 +53,7 @@ const RegistrarAnuncio = () => {
     try {
       const anuncio = await registrarAnuncio(formData, token);
       console.log('Anuncio creado:', anuncio);
-      // Redirigir o limpiar formulario
+      navigate("/profile");
     } catch (err) {
       console.error('Error al crear anuncio:', err);
     }
