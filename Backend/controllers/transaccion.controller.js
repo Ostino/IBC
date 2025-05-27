@@ -70,7 +70,7 @@ const hacerTransaccion = async (transaccion) => {
   };
 };
 
-const crearTransferencia = async (req, res) => {
+const crearTransaccion = async (req, res) => {
   console.log('📥 anuncioId recibido:', req.body.anuncioId);
   try {
     const { anuncioId } = req.body;
@@ -144,7 +144,7 @@ const crearTransferencia = async (req, res) => {
   }
 };
 
-const getTodasLasTransferencias = async (req, res) => {
+const getTodasLasTransacciones = async (req, res) => {
   try {
     const transferencias = await Transaccion.findAll({model: Usuario});
     res.json(transferencias);
@@ -154,7 +154,7 @@ const getTodasLasTransferencias = async (req, res) => {
   }
 };
 
-const getMisTransferencias = async (req, res) => {
+const getMisTransacciones = async (req, res) => {
   try {
     const userId = req.user.id;
 
@@ -175,7 +175,7 @@ const getMisTransferencias = async (req, res) => {
   }
 };
 
-const getTransferenciasPorUsuario = async (req, res) => {
+const getTransaccionesPorUsuario = async (req, res) => {
   try {
     const { id } = req.params;
 
@@ -271,19 +271,10 @@ const cancelarTransaccion = async (req, res) => {
 };
 
 module.exports = {
-  crearTransferencia,
-  getMisTransferencias,
-  getTodasLasTransferencias,
-  getTransferenciasPorUsuario,
-  aprobarTransaccion,
-  cancelarTransaccion,
-  getTransaccionPorId
-};
-module.exports = {
-  crearTransferencia,
-  getMisTransferencias,
-  getTodasLasTransferencias,
-  getTransferenciasPorUsuario,
+  crearTransaccion,
+  getMisTransacciones,
+  getTodasLasTransacciones,
+  getTransaccionesPorUsuario,
   aprobarTransaccion,
   cancelarTransaccion,
   getTransaccionPorId
