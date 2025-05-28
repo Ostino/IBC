@@ -7,15 +7,16 @@ import { getAllMonedas } from "../services/monedaService";
 import { registrarAnuncio } from "../services/anuncioService";
 
 import {
-  Box,
-  Button,
   Container,
-  FormControl,
-  InputLabel,
-  MenuItem,
-  Select,
-  TextField,
   Typography,
+  TextField,
+  Button,
+  Select,
+  MenuItem,
+  InputLabel,
+  FormControl,
+  Box,
+  Paper,
 } from "@mui/material";
 
 const RegistrarAnuncio = () => {
@@ -51,20 +52,9 @@ const RegistrarAnuncio = () => {
     e.preventDefault();
     setError("");
 
-    if (!billeteraSeleccionada) {
-      setError("Selecciona una moneda");
-      return;
-    }
-
-    if (!precioPorUnidad || precioPorUnidad <= 0) {
-      setError("Ingresa un precio por unidad válido");
-      return;
-    }
-
-    if (!cantidad || cantidad <= 0) {
-      setError("Ingresa una cantidad válida");
-      return;
-    }
+    if (!billeteraSeleccionada) return setError("Selecciona una moneda");
+    if (!precioPorUnidad || precioPorUnidad <= 0) return setError("Precio inválido");
+    if (!cantidad || cantidad <= 0) return setError("Cantidad inválida");
 
     const token = sessionStorage.getItem("token");
     const billeteraObj = JSON.parse(billeteraSeleccionada);
@@ -89,104 +79,120 @@ const RegistrarAnuncio = () => {
   };
 
   return (
-    <Container maxWidth="sm" sx={{ mt: 4 }}>
-      <Typography variant="h5" gutterBottom>
-        Registrar Anuncio
-      </Typography>
-      <Box component="form" onSubmit={handleSubmit} noValidate>
-        <FormControl fullWidth margin="normal">
-          <InputLabel id="select-billetera-label">Moneda</InputLabel>
-          <Select
-            labelId="select-billetera-label"
-            value={billeteraSeleccionada}
-            label="Moneda"
-            onChange={(e) => setBilleteraSeleccionada(e.target.value)}
-          >
-            <MenuItem value="">
-              <em>Selecciona una moneda</em>
-            </MenuItem>
-            {billeteras.map((b) => {
-              const moneda = monedas.find((m) => m.id === b.monedaId);
-              const nombreMoneda = moneda ? moneda.nombre : `Moneda ${b.monedaId}`;
-              return (
-                <MenuItem key={b.id} value={JSON.stringify(b)}>
-                  {nombreMoneda}
-                </MenuItem>
-              );
-            })}
-          </Select>
-        </FormControl>
+    <Container maxWidth="sm" sx={{ mt: 4, mb: 4 }}>
+      <Paper elevation={3} sx={{ p: 4 }}>
+        <Typography variant="h5" gutterBottom>
+          Registrar Anuncio
+        </Typography>
 
-        <FormControl fullWidth margin="normal">
-          <InputLabel id="select-tipo-label">Tipo</InputLabel>
-          <Select
-            labelId="select-tipo-label"
-            value={tipo}
-            label="Tipo"
-            onChange={(e) => setTipo(e.target.value)}
-          >
-            <MenuItem value="COMPRA">COMPRA</MenuItem>
-            <MenuItem value="VENTA">VENTA</MenuItem>
-          </Select>
-        </FormControl>
+        <Box
+          component="form"
+          onSubmit={handleSubmit}
+          encType="multipart/form-data"
+          noValidate
+          sx={{ mt: 2 }}
+        >
+          <FormControl fullWidth margin="normal" required>
+            <InputLabel id="select-billetera-label">Moneda</InputLabel>
+            <Select
+              labelId="select-billetera-label"
+              value={billeteraSeleccionada}
+              label="Moneda"
+              onChange={(e) => setBilleteraSeleccionada(e.target.value)}
+            >
+              <MenuItem value="">
+                <em>Selecciona una moneda</em>
+              </MenuItem>
+              {billeteras.map((b) => {
+                const moneda = monedas.find((m) => m.id === b.monedaId);
+                const nombreMoneda = moneda ? moneda.nombre : `Moneda ${b.monedaId}`;
+                return (
+                  <MenuItem key={b.id} value={JSON.stringify(b)}>
+                    {nombreMoneda} (Saldo: {b.saldo})
+                  </MenuItem>
+                );
+              })}
+            </Select>
+          </FormControl>
 
-        <TextField
-          fullWidth
-          type="number"
-          label="Precio por unidad"
-          value={precioPorUnidad}
-          onChange={(e) => setPrecioPorUnidad(e.target.value)}
-          margin="normal"
-          inputProps={{ min: 0, step: "any" }}
-          required
-        />
+          <FormControl fullWidth margin="normal" required>
+            <InputLabel id="select-tipo-label">Tipo</InputLabel>
+            <Select
+              labelId="select-tipo-label"
+              value={tipo}
+              label="Tipo"
+              onChange={(e) => setTipo(e.target.value)}
+            >
+              <MenuItem value="COMPRA">COMPRA</MenuItem>
+              <MenuItem value="VENTA">VENTA</MenuItem>
+            </Select>
+          </FormControl>
 
-        <TextField
-          fullWidth
-          type="number"
-          label="Cantidad"
-          value={cantidad}
-          onChange={(e) => setCantidad(e.target.value)}
-          margin="normal"
-          inputProps={{ min: 0, step: "any" }}
-          required
-        />
-
-        <TextField
-          fullWidth
-          label="Descripción de pago"
-          value={descripcionPago}
-          onChange={(e) => setDescripcionPago(e.target.value)}
-          margin="normal"
-          multiline
-          rows={2}
-        />
-
-        <Button variant="contained" component="label" sx={{ mt: 2 }}>
-          {imagenPago ? "Cambiar imagen de pago" : "Subir imagen de pago"}
-          <input
-            hidden
-            type="file"
-            accept="image/*"
-            onChange={(e) => setImagenPago(e.target.files[0])}
+          <TextField
+            label="Precio por unidad"
+            type="number"
+            required
+            fullWidth
+            margin="normal"
+            value={precioPorUnidad}
+            onChange={(e) => setPrecioPorUnidad(e.target.value)}
+            inputProps={{ min: 0, step: "0.01" }}
           />
-        </Button>
-        {imagenPago && (
-          <Typography variant="body2" sx={{ mt: 1 }}>
-            {imagenPago.name}
-          </Typography>
-        )}
 
-        {error && (
-          <Typography color="error" sx={{ mt: 2 }}>
-            {error}
-          </Typography>
-        )}
+          <TextField
+            label="Cantidad"
+            type="number"
+            required
+            fullWidth
+            margin="normal"
+            value={cantidad}
+            onChange={(e) => setCantidad(e.target.value)}
+            inputProps={{ min: 0, step: "0.01" }}
+          />
 
-        <Button type="submit" variant="contained" fullWidth sx={{ mt: 3 }}>
-          Registrar anuncio
-        </Button>
-      </Box>
+          <TextField
+            label="Descripción del pago"
+            fullWidth
+            margin="normal"
+            multiline
+            rows={3}
+            value={descripcionPago}
+            onChange={(e) => setDescripcionPago(e.target.value)}
+          />
+
+          <Box sx={{ mt: 2, mb: 3 }}>
+            <InputLabel htmlFor="imagenPago">Imagen de pago (opcional)</InputLabel>
+            <input
+              id="imagenPago"
+              type="file"
+              accept="image/*"
+              onChange={(e) => setImagenPago(e.target.files[0])}
+              style={{ marginTop: 8 }}
+            />
+            {imagenPago && (
+              <Typography variant="body2" sx={{ mt: 1 }}>
+                {imagenPago.name}
+              </Typography>
+            )}
+          </Box>
+
+          {error && (
+            <Typography color="error" sx={{ mt: 2 }}>
+              {error}
+            </Typography>
+          )}
+
+          <Button
+            type="submit"
+            variant="contained"
+            color="primary"
+            fullWidth
+            size="large"
+          >
+            Registrar anuncio
+          </Button>
+        </Box>
+      </Paper>
     </Container>
   );
 };
