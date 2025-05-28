@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getAllMonedas } from "../services/monedaService";
-import { crearBilletera } from "../services/billeteraService";
+import { crearBilletera, getBilleterasConMonedaUser } from "../services/billeteraService";
 
 import {
   Container,
@@ -32,17 +32,23 @@ export default function CrearBilletera() {
       return;
     }
 
-    const cargarMonedas = async () => {
+    const cargarMonedasDisponibles = async () => {
       try {
-        const data = await getAllMonedas(token);
-        setMonedas(data);
+        const [todasLasMonedas, billeterasUsuario] = await Promise.all([
+          getAllMonedas(token),
+          getBilleterasConMonedaUser(token),
+        ]);
+
+        const monedasUsadas = billeterasUsuario.map(b => b.monedaId);
+        const monedasFiltradas = todasLasMonedas.filter(m => !monedasUsadas.includes(m.id));
+        setMonedas(monedasFiltradas);
       } catch (error) {
         console.error("Error al cargar monedas:", error);
         setError("No se pudieron cargar las monedas.");
       }
     };
 
-    cargarMonedas();
+    cargarMonedasDisponibles();
   }, [token, navigate]);
 
   const handleSubmit = async (e) => {
