@@ -1,4 +1,5 @@
-const { Transaccion, Anuncio, Billetera, Usuario } = require('../models');
+const { Console } = require('console');
+const { Transaccion, Anuncio, Billetera, Usuario,Moneda } = require('../models');
 const fs = require('fs');
 const path = require('path');
 const { Op } = require('sequelize');
@@ -270,6 +271,168 @@ const cancelarTransaccion = async (req, res) => {
   }
 };
 
+const crearTransferencia = async (req, res) => {
+  try {
+    const {
+      monto,
+      descripcionPago,
+      deBilleteraId,
+      haciaBilleteraId
+    } = req.body;
+
+    const compradorId = req.user.id;
+
+    // Obtener vendedor desde la billetera de destino
+    const billeteraDestino = await Billetera.findByPk(haciaBilleteraId);
+    if (!billeteraDestino) {
+      return res.status(404).json({ error: 'Billetera destino no encontrada' });
+    }
+
+    const vendedorId = billeteraDestino.usuarioId;
+
+    // Crear la transacción (sin comprobante aún)
+    const transaccion = await Transaccion.create({
+      tipo: 'TRANSFERENCIA',
+      monto,
+      descripcionPago,
+      deBilleteraId,
+      haciaBilleteraId,
+      compradorId,
+      vendedorId
+      // estado queda como "Pendiente" por defecto
+    });
+
+    // Si hay imagen de comprobante, renombrarla
+    if (req.file) {
+      const ext = path.extname(req.file.originalname);
+      const nuevoNombre = `${transaccion.id}_comprobante${ext}`;
+      const nuevaRuta = path.join('ImagenesComprobante', nuevoNombre);
+
+      // Renombrar archivo en el sistema
+      fs.renameSync(req.file.path, nuevaRuta);
+
+      // Guardar nuevo nombre en la transacción
+      transaccion.comprobantePago = nuevoNombre;
+      await transaccion.save();
+    }
+
+    res.status(201).json(transaccion);
+  } catch (error) {
+    console.error('Error al crear transferencia:', error);
+    res.status(500).json({ error: 'Error al crear transferencia' });
+  }
+};
+
+const rechazarTransferencia = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const transaccion = await Transaccion.findByPk(id);
+    if (!transaccion) {
+      return res.status(404).json({ error: 'Transferencia no encontrada' });
+    }
+
+    transaccion.estado = 'CANCELADO';
+    await transaccion.save();
+
+    res.json({ mensaje: 'Transferencia cancelada', transaccion });
+  } catch (error) {
+    console.error('Error al cancelar transferencia:', error);
+    res.status(500).json({ error: 'Error al cancelar transferencia' });
+  }
+};
+
+const aprobarTransferencia = async (req, res) => {
+  const { id } = req.params;
+  console.log("✅ Iniciando aprobación de transferencia con ID:", id);
+
+  try {
+    const transaccion = await Transaccion.findByPk(id, {
+      include: [
+        {
+          model: Billetera,
+          as: 'deBilletera',
+          include: [Moneda],
+        },
+        {
+          model: Billetera,
+          as: 'haciaBilletera',
+          include: [Moneda],
+        },
+      ],
+    });
+
+    if (!transaccion) {
+      return res.status(404).json({ error: 'Transferencia no encontrada' });
+    }
+
+    if (transaccion.estado !== 'PENDIENTE') {
+      return res.status(400).json({ error: 'La transferencia ya ha sido procesada' });
+    }
+
+    const deBilletera = transaccion.deBilletera;
+    const haciaBilletera = transaccion.haciaBilletera;
+
+    if (!deBilletera || !haciaBilletera) {
+      return res.status(400).json({ error: 'No se pudo encontrar alguna de las billeteras asociadas' });
+    }
+
+    let montoFinal = Number(transaccion.monto);
+    const montoOriginal = Number(transaccion.monto);
+
+    // Si son monedas distintas, se convierte el monto
+    if (deBilletera.monedaId !== haciaBilletera.monedaId) {
+      const monedaOrigen = deBilletera.Moneda;
+      const monedaDestino = haciaBilletera.Moneda;
+
+      if (!monedaOrigen || !monedaDestino) {
+        return res.status(400).json({ error: 'No se pudo obtener datos de las monedas' });
+      }
+
+      const valorOrigen = Number(monedaOrigen.valueInSus);
+      const valorDestino = Number(monedaDestino.valueInSus);
+
+      console.log("💱 Moneda origen:", monedaOrigen.nombre, "| valorEnSus:", valorOrigen);
+      console.log("💱 Moneda destino:", monedaDestino.nombre, "| valorEnSus:", valorDestino);
+      console.log("💸 Monto original:", montoOriginal);
+
+      if (isNaN(valorOrigen) || isNaN(valorDestino)) {
+        return res.status(400).json({ error: 'Valores de conversión inválidos' });
+      }
+
+      montoFinal = (montoOriginal * valorOrigen) / valorDestino;
+
+      console.log("✅ Monto convertido:", montoFinal);
+    }
+
+    // Verificar saldo suficiente
+    if (deBilletera.saldo < montoOriginal) {
+      return res.status(400).json({ error: 'Saldo insuficiente en la billetera de origen' });
+    }
+
+    // Realizar la transferencia
+    deBilletera.saldo -= montoOriginal;
+    haciaBilletera.saldo += montoFinal;
+
+    console.log("📉 Nuevo saldo en billetera origen:", deBilletera.saldo);
+    console.log("📈 Nuevo saldo en billetera destino:", haciaBilletera.saldo);
+
+    // Guardar cambios
+    await deBilletera.save();
+    await haciaBilletera.save();
+
+    transaccion.estado = 'APROBADO';
+    await transaccion.save();
+
+    console.log("✅ Transferencia aprobada y guardada");
+
+    res.json({ mensaje: 'Transferencia aprobada con éxito', transaccion });
+  } catch (error) {
+    console.error('❌ Error al aprobar transferencia:', error);
+    res.status(500).json({ error: 'Error al aprobar transferencia' });
+  }
+};
+
 module.exports = {
   crearTransaccion,
   getMisTransacciones,
@@ -277,5 +440,8 @@ module.exports = {
   getTransaccionesPorUsuario,
   aprobarTransaccion,
   cancelarTransaccion,
-  getTransaccionPorId
+  getTransaccionPorId,
+  crearTransferencia,
+  rechazarTransferencia,
+  aprobarTransferencia
 };

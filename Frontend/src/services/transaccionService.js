@@ -42,3 +42,27 @@ export const rechazarTransaccion = async (id, token) => {
   });
   return res.data;
 };
+
+export const crearTransferencia = async (formData, token) => {
+  const response = await axios.post(`${API_URL}/crear/transferencia`, formData, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "multipart/form-data",
+    },
+  });
+  return response.data;
+};
+export const aprobarTransferencia = async (id, token) => {
+  console.log("id: ",id,"token :",token)
+const res = await axios.patch(`${API_URL}/transferencia/${id}/aprobar`, null, {
+headers: { Authorization: `Bearer ${token}` },
+});
+return res.data;
+};
+
+export const cancelarTransferencia = async (id, token) => {
+const res = await axios.patch(`${API_URL}/transferencia/${id}/cancelar`, null, {
+headers: { Authorization: `Bearer ${token}` },
+});
+return res.data;
+};

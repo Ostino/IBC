@@ -99,22 +99,26 @@ export default function Profile() {
         <button onClick={() => navigate("/transacciones")}>
         Ver transacciones
         </button>
+        <button onClick={() => navigate("/crear-transferencia")} style={{ marginLeft: "1rem" }}>
+        Crear Transferencia
+        </button>
+
       </div>
           
       <div style={{ marginTop: "2rem" }}>
-        <h3>Mis Billeteras</h3>
-        {billeteras.length === 0 ? (
-          <p>No tienes billeteras.</p>
-        ) : (
-          <ul>
-            {billeteras.map((b) => (
-              <li key={b.id}>
-                <strong>{b.moneda.nombre}</strong> - Saldo: {b.saldo}
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
+  <h3>Mis Billeteras</h3>
+  {billeteras.length === 0 ? (
+    <p>No tienes billeteras.</p>
+  ) : (
+    <ul>
+      {billeteras.map((b) => (
+        <li key={b.id}>
+          <strong>{b.moneda.nombre}</strong> (ID: {b.id}) - Saldo: {b.saldo}
+        </li>
+      ))}
+    </ul>
+  )}
+</div>
 
       <div style={{ marginTop: "2rem" }}>
         <h3>Monedas disponibles</h3>

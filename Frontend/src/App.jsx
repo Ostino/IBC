@@ -10,6 +10,8 @@ import CompraVenta from "./pages/CompraVenta";
 import CompraVentaDetalle from "./pages/CVDetalle";
 import Transacciones from "./pages/Transacciones";
 import CrearBilletera from "./pages/CrearBilletera";
+import CrearTransferencia from "./pages/CrearTransferencia";
+
 export default function App() {
   return (
     <Routes>
@@ -24,6 +26,8 @@ export default function App() {
       <Route path="/compraventa-detalle" element={<CompraVentaDetalle />} />
       <Route path="/transacciones" element={<Transacciones />} />
       <Route path="/crear-billetera" element={<CrearBilletera />} />
+      <Route path="/crear-transferencia" element={<CrearTransferencia />} />
+
     </Routes>
   );
 }

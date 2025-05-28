@@ -1,85 +1,129 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { getMisTransferencias ,aprobarTransaccion,rechazarTransaccion } from "../services/transaccionService";
-import { obtenerUrlImagenComprobante } from "../services/imgeneService";
+import {
+  getMisTransferencias,
+  aprobarTransaccion,
+  rechazarTransaccion,
+  aprobarTransferencia,
+  cancelarTransferencia,
+} from "../services/transaccionService";
 
 export default function Transacciones() {
-  const [transferencias, setTransferencias] = useState([]);
-  const navigate = useNavigate();
+  const [transacciones, setTransacciones] = useState([]);
   const token = sessionStorage.getItem("token");
-if (!token) {
-      navigate("/login");
-      return;
-    }
-  const cargarTransferencias = async () => {
-    try {
-      const data = await getMisTransferencias(token);
-      setTransferencias(data);
-    } catch (err) {
-      console.error("Error al cargar transferencias:", err);
-    }
-  };
 
   useEffect(() => {
-    if (token) cargarTransferencias();
+    const fetchData = async () => {
+      try {
+        const data = await getMisTransferencias(token);
+        setTransacciones(data);
+      } catch (error) {
+        console.error("Error al cargar transferencias:", error);
+      }
+    };
+
+    fetchData();
   }, [token]);
 
-  const handleAprobar = async (id) => {
+  const manejarAprobarCompraVenta = async (id) => {
     try {
-      await aprobarTransaccion(id, token);
-      await cargarTransferencias();
-    } catch (err) {
-      console.error("Error al aprobar:", err);
+      await aprobarTransaccion(id,token);
+      actualizarEstado(id, "APROBADO");
+    } catch (error) {
+      console.error("Error al aprobar:", error);
     }
   };
 
-  const handleRechazar = async (id) => {
+  const manejarCancelarCompraVenta = async (id) => {
     try {
-      await rechazarTransaccion(id, token);
-      await cargarTransferencias();
-    } catch (err) {
-      console.error("Error al rechazar:", err);
+      await rechazarTransaccion(id,token);
+      actualizarEstado(id, "CANCELADO");
+    } catch (error) {
+      console.error("Error al cancelar:", error);
     }
+  };
+
+  const manejarAprobarTransferencia = async (id) => {
+    try {
+      await aprobarTransferencia(id,token);
+      actualizarEstado(id, "APROBADO");
+    } catch (error) {
+      console.error("Error al aprobar transferencia:", error);
+    }
+  };
+
+  const manejarCancelarTransferencia = async (id) => {
+    try {
+      await cancelarTransferencia(id,token);
+      actualizarEstado(id, "CANCELADO");
+    } catch (error) {
+      console.error("Error al cancelar transferencia:", error);
+    }
+  };
+
+  const actualizarEstado = (id, nuevoEstado) => {
+    setTransacciones((prev) =>
+      prev.map((t) => (t.id === id ? { ...t, estado: nuevoEstado } : t))
+    );
   };
 
   return (
-    <div style={{ maxWidth: 900, margin: "2rem auto", padding: "1rem" }}>
+    <div style={{ maxWidth: "800px", margin: "2rem auto" }}>
       <h2>Mis Transacciones</h2>
-      {transferencias.length === 0 ? (
+      {transacciones.length === 0 ? (
         <p>No tienes transacciones.</p>
       ) : (
-        transferencias.map((t) => (
-          <div key={t.id} style={{ border: "1px solid #ccc", padding: "1rem", marginBottom: "1rem", borderRadius: "8px" }}>
-            <p><strong>Tipo:</strong> {t.tipo}</p>
-            <p><strong>Monto:</strong> {t.monto}</p>
-            <p><strong>Estado:</strong> {t.estado}</p>
-            <p><strong>Divisa:</strong> {t.Anuncio?.divisa}</p>
-            <p><strong>Descripción de pago:</strong> {t.descripcionPago}</p>
-            <p><strong>Precio por unidad:</strong> {t.Anuncio?.precioPorUnidad}</p>
+        <ul>
+          {transacciones.map((t) => (
+            <li key={t.id} style={{ marginBottom: "1.5rem", borderBottom: "1px solid #ccc", paddingBottom: "1rem" }}>
+              <p><strong>ID:</strong> {t.id}</p>
+              <p><strong>Tipo:</strong> {t.tipo}</p>
+              <p><strong>Monto:</strong> {t.monto}</p>
+              <p><strong>Estado:</strong> {t.estado}</p>
+              <p><strong>Descripción:</strong> {t.descripcionPago}</p>
+              {t.Anuncio && (
+                <p><strong>Moneda:</strong> {t.Anuncio.divisa}</p>
+              )}
+              <p><strong>Comprador ID:</strong> {t.compradorId}</p>
+              <p><strong>Vendedor ID:</strong> {t.vendedorId}</p>
+              {t.comprobantePago && (
+                <div>
+                  <p><strong>Comprobante:</strong></p>
+                  <img
+                    src={`http://localhost:3000/ImagenesComprobantes/${t.comprobantePago}`}
+                    alt="Comprobante"
+                    style={{ width: "100%", maxWidth: "300px", borderRadius: "4px" }}
+                  />
+                </div>
+              )}
 
-            {t.comprobantePago && (
-              <div style={{ marginTop: "1rem" }}>
-                <p><strong>Comprobante:</strong></p>
-                <img
-                  src={obtenerUrlImagenComprobante(t.comprobantePago)}
-                  alt="Comprobante"
-                  style={{ width: "100%", maxWidth: "300px", borderRadius: "4px" }}
-                />
-              </div>
-            )}
-
-            {t.estado === "Pendiente" && (
-              <div style={{ marginTop: "1rem" }}>
-                <button onClick={() => handleAprobar(t.id)} style={{ marginRight: "1rem", backgroundColor: "#d4edda" }}>
-                  Aprobar
-                </button>
-                <button onClick={() => handleRechazar(t.id)} style={{ backgroundColor: "#f8d7da" }}>
-                  Rechazar
-                </button>
-              </div>
-            )}
-          </div>
-        ))
+              {/* Botones según tipo y estado */}
+              {t.estado === "PENDIENTE" && (
+                <>
+                  {["COMPRA", "VENTA"].includes(t.tipo) && (
+                    <>
+                      <button onClick={() => manejarAprobarCompraVenta(t.id)} style={{ marginRight: "1rem" }}>
+                        Aprobar
+                      </button>
+                      <button onClick={() => manejarCancelarCompraVenta(t.id)}>
+                        Rechazar
+                      </button>
+                    </>
+                  )}
+                  {t.tipo === "TRANSFERENCIA" && (
+                    <>
+                      <button onClick={() => manejarAprobarTransferencia(t.id)} style={{ marginRight: "1rem" }}>
+                        Aprobar
+                      </button>
+                      <button onClick={() => manejarCancelarTransferencia(t.id)}>
+                        Rechazar
+                      </button>
+                    </>
+                  )}
+                </>
+              )}
+            </li>
+          ))}
+        </ul>
       )}
     </div>
   );
