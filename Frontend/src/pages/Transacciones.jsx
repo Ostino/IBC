@@ -7,6 +7,19 @@ import {
   cancelarTransferencia,
 } from "../services/transaccionService";
 
+import {
+  Container,
+  Typography,
+  List,
+  ListItem,
+  ListItemText,
+  ListItemSecondaryAction,
+  Button,
+  Box,
+  Divider,
+  Paper,
+} from "@mui/material";
+
 export default function Transacciones() {
   const [transacciones, setTransacciones] = useState([]);
   const token = sessionStorage.getItem("token");
@@ -24,9 +37,15 @@ export default function Transacciones() {
     fetchData();
   }, [token]);
 
+  const actualizarEstado = (id, nuevoEstado) => {
+    setTransacciones((prev) =>
+      prev.map((t) => (t.id === id ? { ...t, estado: nuevoEstado } : t))
+    );
+  };
+
   const manejarAprobarCompraVenta = async (id) => {
     try {
-      await aprobarTransaccion(id,token);
+      await aprobarTransaccion(id, token);
       actualizarEstado(id, "APROBADO");
     } catch (error) {
       console.error("Error al aprobar:", error);
@@ -35,7 +54,7 @@ export default function Transacciones() {
 
   const manejarCancelarCompraVenta = async (id) => {
     try {
-      await rechazarTransaccion(id,token);
+      await rechazarTransaccion(id, token);
       actualizarEstado(id, "CANCELADO");
     } catch (error) {
       console.error("Error al cancelar:", error);
@@ -44,7 +63,7 @@ export default function Transacciones() {
 
   const manejarAprobarTransferencia = async (id) => {
     try {
-      await aprobarTransferencia(id,token);
+      await aprobarTransferencia(id, token);
       actualizarEstado(id, "APROBADO");
     } catch (error) {
       console.error("Error al aprobar transferencia:", error);
@@ -53,78 +72,109 @@ export default function Transacciones() {
 
   const manejarCancelarTransferencia = async (id) => {
     try {
-      await cancelarTransferencia(id,token);
+      await cancelarTransferencia(id, token);
       actualizarEstado(id, "CANCELADO");
     } catch (error) {
       console.error("Error al cancelar transferencia:", error);
     }
   };
 
-  const actualizarEstado = (id, nuevoEstado) => {
-    setTransacciones((prev) =>
-      prev.map((t) => (t.id === id ? { ...t, estado: nuevoEstado } : t))
-    );
-  };
-
   return (
-    <div style={{ maxWidth: "800px", margin: "2rem auto" }}>
-      <h2>Mis Transacciones</h2>
-      {transacciones.length === 0 ? (
-        <p>No tienes transacciones.</p>
-      ) : (
-        <ul>
-          {transacciones.map((t) => (
-            <li key={t.id} style={{ marginBottom: "1.5rem", borderBottom: "1px solid #ccc", paddingBottom: "1rem" }}>
-              <p><strong>ID:</strong> {t.id}</p>
-              <p><strong>Tipo:</strong> {t.tipo}</p>
-              <p><strong>Monto:</strong> {t.monto}</p>
-              <p><strong>Estado:</strong> {t.estado}</p>
-              <p><strong>Descripción:</strong> {t.descripcionPago}</p>
-              {t.Anuncio && (
-                <p><strong>Moneda:</strong> {t.Anuncio.divisa}</p>
-              )}
-              <p><strong>Comprador ID:</strong> {t.compradorId}</p>
-              <p><strong>Vendedor ID:</strong> {t.vendedorId}</p>
-              {t.comprobantePago && (
-                <div>
-                  <p><strong>Comprobante:</strong></p>
-                  <img
-                    src={`http://localhost:3000/ImagenesComprobantes/${t.comprobantePago}`}
-                    alt="Comprobante"
-                    style={{ width: "100%", maxWidth: "300px", borderRadius: "4px" }}
-                  />
-                </div>
-              )}
+    <Container maxWidth="md" sx={{ mt: 4, mb: 4 }}>
+      <Typography variant="h4" gutterBottom>
+        Mis Transacciones
+      </Typography>
 
-              {/* Botones según tipo y estado */}
+      {transacciones.length === 0 ? (
+        <Typography variant="body1">No tienes transacciones.</Typography>
+      ) : (
+        <List>
+          {transacciones.map((t) => (
+            <Paper key={t.id} sx={{ p: 2, mb: 2 }}>
+              <ListItem alignItems="flex-start" disableGutters>
+                <ListItemText
+                  primary={`ID: ${t.id} — Tipo: ${t.tipo} — Estado: ${t.estado}`}
+                  secondary={
+                    <>
+                      <Typography variant="body2" color="text.primary">
+                        Monto: {t.monto}
+                      </Typography>
+                      <Typography variant="body2" color="text.primary">
+                        Descripción: {t.descripcionPago}
+                      </Typography>
+                      {t.Anuncio && (
+                        <Typography variant="body2" color="text.primary">
+                          Moneda: {t.Anuncio.divisa}
+                        </Typography>
+                      )}
+                      <Typography variant="body2" color="text.primary">
+                        Comprador ID: {t.compradorId}
+                      </Typography>
+                      <Typography variant="body2" color="text.primary">
+                        Vendedor ID: {t.vendedorId}
+                      </Typography>
+                      {t.comprobantePago && (
+                        <Box mt={2}>
+                          <Typography variant="body2" fontWeight="bold" gutterBottom>
+                            Comprobante:
+                          </Typography>
+                          <img
+                            src={`http://localhost:3000/ImagenesComprobantes/${t.comprobantePago}`}
+                            alt="Comprobante"
+                            style={{ maxWidth: "100%", maxHeight: 200, borderRadius: 4 }}
+                          />
+                        </Box>
+                      )}
+                    </>
+                  }
+                />
+              </ListItem>
+
               {t.estado === "PENDIENTE" && (
-                <>
+                <Box mt={2} display="flex" gap={2}>
                   {["COMPRA", "VENTA"].includes(t.tipo) && (
                     <>
-                      <button onClick={() => manejarAprobarCompraVenta(t.id)} style={{ marginRight: "1rem" }}>
+                      <Button
+                        variant="contained"
+                        color="success"
+                        onClick={() => manejarAprobarCompraVenta(t.id)}
+                      >
                         Aprobar
-                      </button>
-                      <button onClick={() => manejarCancelarCompraVenta(t.id)}>
+                      </Button>
+                      <Button
+                        variant="outlined"
+                        color="error"
+                        onClick={() => manejarCancelarCompraVenta(t.id)}
+                      >
                         Rechazar
-                      </button>
+                      </Button>
                     </>
                   )}
+
                   {t.tipo === "TRANSFERENCIA" && (
                     <>
-                      <button onClick={() => manejarAprobarTransferencia(t.id)} style={{ marginRight: "1rem" }}>
+                      <Button
+                        variant="contained"
+                        color="success"
+                        onClick={() => manejarAprobarTransferencia(t.id)}
+                      >
                         Aprobar
-                      </button>
-                      <button onClick={() => manejarCancelarTransferencia(t.id)}>
+                      </Button>
+                      <Button
+                        variant="outlined"
+                        color="error"
+                        onClick={() => manejarCancelarTransferencia(t.id)}
+                      >
                         Rechazar
-                      </button>
+                      </Button>
                     </>
                   )}
-                </>
+                </Box>
               )}
-            </li>
+            </Paper>
           ))}
-        </ul>
+        </List>
       )}
-    </div>
+    </Container>
   );
 }

@@ -1,6 +1,9 @@
+// src/App.jsx
 import { Routes, Route, Navigate } from "react-router-dom";
+import { ThemeProvider, createTheme } from '@mui/material/styles';
+import CssBaseline from '@mui/material/CssBaseline';
+
 import Login from "./pages/Login";
-// Las siguientes se agregan después:
 import Register from "./pages/Register";
 import Profile from "./pages/Perfil";
 import AdmUsuarios from "./pages/AdmUsuarios";
@@ -12,22 +15,34 @@ import Transacciones from "./pages/Transacciones";
 import CrearBilletera from "./pages/CrearBilletera";
 import CrearTransferencia from "./pages/CrearTransferencia";
 
+const theme = createTheme({
+  palette: {
+    primary: { main: '#1976d2' },
+    secondary: { main: '#dc004e' },
+  },
+  typography: {
+    fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
+  },
+});
+
 export default function App() {
   return (
-    <Routes>
-      <Route path="/" element={<Navigate to="/login" />} />
-      <Route path="/login" element={<Login />} />
-      <Route path="/register" element={<Register />} />
-      <Route path="/profile" element={<Profile />} />
-      <Route path="/admUsuarios" element={<AdmUsuarios />} />
-      <Route path="/admMonedas" element={<AdmMonedas />} />
-      <Route path="/registrar-anuncio" element={<RegistrarAnuncio />} />
-      <Route path="/compraventa/:idMoneda" element={<CompraVenta />} />
-      <Route path="/compraventa-detalle" element={<CompraVentaDetalle />} />
-      <Route path="/transacciones" element={<Transacciones />} />
-      <Route path="/crear-billetera" element={<CrearBilletera />} />
-      <Route path="/crear-transferencia" element={<CrearTransferencia />} />
-
-    </Routes>
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <Routes>
+        <Route path="/" element={<Navigate to="/login" />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/profile" element={<Profile />} />
+        <Route path="/admUsuarios" element={<AdmUsuarios />} />
+        <Route path="/admMonedas" element={<AdmMonedas />} />
+        <Route path="/registrar-anuncio" element={<RegistrarAnuncio />} />
+        <Route path="/compraventa/:idMoneda" element={<CompraVenta />} />
+        <Route path="/compraventa-detalle" element={<CompraVentaDetalle />} />
+        <Route path="/transacciones" element={<Transacciones />} />
+        <Route path="/crear-billetera" element={<CrearBilletera />} />
+        <Route path="/crear-transferencia" element={<CrearTransferencia />} />
+      </Routes>
+    </ThemeProvider>
   );
 }

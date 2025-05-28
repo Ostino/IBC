@@ -20,3 +20,7 @@ Instaladores
 npm install
 
 npm install axios react-router-dom
+
+npm install @mui/material @emotion/react @emotion/styled
+
+npm install @mui/icons-material

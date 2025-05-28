@@ -1,17 +1,29 @@
 import { useLocation, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import {
+  Container,
+  Typography,
+  Button,
+  TextField,
+  Box,
+  Paper,
+} from "@mui/material";
 import { crearTransaccion } from "../services/transaccionService";
+
 export default function CompraVentaDetalle() {
-  const { state } = useLocation(); // el anuncio se pasa desde navigate con state
+  const { state } = useLocation();
   const anuncio = state?.anuncio;
   const [comprobante, setComprobante] = useState(null);
   const token = sessionStorage.getItem("token");
   const navigate = useNavigate();
-  if (!token) {
+
+  useEffect(() => {
+    if (!token) {
       navigate("/login");
-      return;
     }
-  if (!anuncio) return <p>No se encontró el anuncio.</p>;
+  }, [token, navigate]);
+
+  if (!anuncio) return <Typography>No se encontró el anuncio.</Typography>;
 
   const handleFileChange = (e) => {
     setComprobante(e.target.files[0]);
@@ -24,7 +36,6 @@ export default function CompraVentaDetalle() {
     }
 
     try {
-      console.log(anuncio.id,"anuncio id ", token, "token")
       await crearTransaccion(anuncio.id, comprobante, token);
       alert("Transacción realizada con éxito.");
       navigate("/profile");
@@ -35,25 +46,44 @@ export default function CompraVentaDetalle() {
   };
 
   return (
-    <div style={{ maxWidth: 600, margin: "2rem auto", padding: "1rem" }}>
-      <h2>Detalle del Anuncio</h2>
-      <p><strong>Tipo:</strong> {anuncio.tipo}</p>
-      <p><strong>Precio por unidad:</strong> {anuncio.precioPorUnidad}</p>
-      <p><strong>Cantidad:</strong> {anuncio.cantidad}</p>
-      <p><strong>Divisa:</strong> {anuncio.divisa}</p>
-      <p><strong>Descripción de pago:</strong> {anuncio.descripcionPago || "N/A"}</p>
+    <Container maxWidth="sm" sx={{ mt: 4, mb: 4 }}>
+      <Paper elevation={3} sx={{ p: 3 }}>
+        <Typography variant="h5" gutterBottom>
+          Detalle del Anuncio
+        </Typography>
 
-      <div style={{ marginTop: "1rem" }}>
-        <label><strong>Adjuntar comprobante:</strong></label><br />
-        <input type="file" accept="image/*" onChange={handleFileChange} />
-      </div>
+        <Box sx={{ mb: 2 }}>
+          <Typography><strong>Tipo:</strong> {anuncio.tipo}</Typography>
+          <Typography><strong>Precio por unidad:</strong> {anuncio.precioPorUnidad}</Typography>
+          <Typography><strong>Cantidad:</strong> {anuncio.cantidad}</Typography>
+          <Typography><strong>Divisa:</strong> {anuncio.divisa}</Typography>
+          <Typography><strong>Descripción de pago:</strong> {anuncio.descripcionPago || "N/A"}</Typography>
+        </Box>
 
-      <button
-        onClick={handleTransaccion}
-        style={{ marginTop: "1rem", backgroundColor: "#4caf50", color: "#fff", padding: "0.5rem 1rem" }}
-      >
-        Hacer Transacción
-      </button>
-    </div>
+        <Box sx={{ mb: 2 }}>
+          <Typography component="label" htmlFor="comprobante-file" sx={{ fontWeight: 'bold', mb: 1, display: 'block' }}>
+            Adjuntar comprobante:
+          </Typography>
+          <input
+            id="comprobante-file"
+            type="file"
+            accept="image/*"
+            onChange={handleFileChange}
+            style={{ display: 'block', marginBottom: '1rem' }}
+          />
+        </Box>
+
+        <Button
+          variant="contained"
+          color="success"
+          fullWidth
+          onClick={handleTransaccion}
+          disabled={!comprobante}
+          size="large"
+        >
+          Hacer Transacción
+        </Button>
+      </Paper>
+    </Container>
   );
 }

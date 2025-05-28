@@ -3,10 +3,25 @@ import { useNavigate } from "react-router-dom";
 import { getAllMonedas } from "../services/monedaService";
 import { crearBilletera } from "../services/billeteraService";
 
+import {
+  Box,
+  Button,
+  Container,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+  TextField,
+  Typography,
+  Alert,
+} from "@mui/material";
+
 export default function CrearBilletera() {
   const [monedas, setMonedas] = useState([]);
   const [monedaIdSeleccionada, setMonedaIdSeleccionada] = useState("");
   const [saldo, setSaldo] = useState("");
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
   const navigate = useNavigate();
 
   const token = sessionStorage.getItem("token");
@@ -22,66 +37,91 @@ export default function CrearBilletera() {
         setMonedas(data);
       } catch (error) {
         console.error("Error al cargar monedas:", error);
+        setError("No se pudieron cargar las monedas.");
       }
     };
 
-    if (token) {
-      cargarMonedas();
-    }
-  }, [token]);
+    cargarMonedas();
+  }, [token, navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError("");
+    setSuccess("");
 
-    if (!monedaIdSeleccionada || !saldo) {
-      alert("Por favor selecciona una moneda e ingresa un saldo.");
+    if (!monedaIdSeleccionada) {
+      setError("Por favor selecciona una moneda.");
+      return;
+    }
+    if (!saldo || isNaN(saldo) || Number(saldo) < 0) {
+      setError("Por favor ingresa un saldo válido mayor o igual a 0.");
       return;
     }
 
     try {
       await crearBilletera(parseInt(monedaIdSeleccionada), parseFloat(saldo), token);
-      alert("Billetera creada exitosamente.");
-      navigate("/profile"); // Redirige si deseas
+      setSuccess("Billetera creada exitosamente.");
+      setTimeout(() => {
+        navigate("/profile");
+      }, 1500);
     } catch (error) {
       console.error("Error al crear billetera:", error);
-      alert("No se pudo crear la billetera.");
+      setError("No se pudo crear la billetera. Intenta de nuevo.");
     }
   };
 
   return (
-    <div style={{ maxWidth: "400px", margin: "2rem auto" }}>
-      <h2>Crear Billetera</h2>
-      <form onSubmit={handleSubmit}>
-        <div style={{ marginBottom: "1rem" }}>
-          <label>Selecciona Moneda:</label>
-          <select
+    <Container maxWidth="xs" sx={{ mt: 5 }}>
+      <Typography variant="h5" component="h1" gutterBottom>
+        Crear Billetera
+      </Typography>
+
+      {error && (
+        <Alert severity="error" sx={{ mb: 2 }}>
+          {error}
+        </Alert>
+      )}
+      {success && (
+        <Alert severity="success" sx={{ mb: 2 }}>
+          {success}
+        </Alert>
+      )}
+
+      <Box component="form" onSubmit={handleSubmit} noValidate>
+        <FormControl fullWidth margin="normal" required>
+          <InputLabel id="select-moneda-label">Selecciona Moneda</InputLabel>
+          <Select
+            labelId="select-moneda-label"
             value={monedaIdSeleccionada}
+            label="Selecciona Moneda"
             onChange={(e) => setMonedaIdSeleccionada(e.target.value)}
-            required
           >
-            <option value="">-- Selecciona una moneda --</option>
+            <MenuItem value="">
+              <em>-- Selecciona una moneda --</em>
+            </MenuItem>
             {monedas.map((moneda) => (
-              <option key={moneda.id} value={moneda.id}>
+              <MenuItem key={moneda.id} value={moneda.id}>
                 {moneda.nombre} ({moneda.codigo})
-              </option>
+              </MenuItem>
             ))}
-          </select>
-        </div>
+          </Select>
+        </FormControl>
 
-        <div style={{ marginBottom: "1rem" }}>
-          <label>Saldo inicial:</label>
-          <input
-            type="number"
-            value={saldo}
-            onChange={(e) => setSaldo(e.target.value)}
-            required
-            min="0"
-            step="0.01"
-          />
-        </div>
+        <TextField
+          label="Saldo inicial"
+          type="number"
+          inputProps={{ min: 0, step: "0.01" }}
+          fullWidth
+          margin="normal"
+          value={saldo}
+          onChange={(e) => setSaldo(e.target.value)}
+          required
+        />
 
-        <button type="submit">Crear Billetera</button>
-      </form>
-    </div>
+        <Button type="submit" variant="contained" fullWidth sx={{ mt: 3 }}>
+          Crear Billetera
+        </Button>
+      </Box>
+    </Container>
   );
 }

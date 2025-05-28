@@ -1,21 +1,45 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import { useNavigate, Link } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
+import {
+  Container,
+  Typography,
+  Button,
+  ButtonGroup,
+  Grid,
+  Card,
+  CardContent,
+  CardActions,
+  CardMedia,
+} from "@mui/material";
+
 import { getAnunciosPorMonedaYTipo } from "../services/compraVentaService";
 import { obtenerUrlImagenPago } from "../services/imgeneService";
+import { getAllMonedas } from "../services/monedaService";  // Importa getAllMonedas
 
 export default function CompraVenta() {
   const { idMoneda } = useParams();
+  const [moneda, setMoneda] = useState(null);
   const [tipoSeleccionado, setTipoSeleccionado] = useState("compra");
   const [anuncios, setAnuncios] = useState([]);
   const token = sessionStorage.getItem("token");
   const navigate = useNavigate();
 
   useEffect(() => {
-     if (!token) {
-        navigate("/login");
-        return;
+    if (!token) {
+      navigate("/login");
+      return;
+    }
+
+    const fetchMoneda = async () => {
+      try {
+        const monedas = await getAllMonedas(token);
+        const monedaEncontrada = monedas.find(m => m.id === parseInt(idMoneda));
+        setMoneda(monedaEncontrada || null);
+      } catch (error) {
+        console.error("Error al obtener moneda:", error);
       }
+    };
+
     const cargarAnuncios = async () => {
       try {
         const data = await getAnunciosPorMonedaYTipo(idMoneda, tipoSeleccionado, token);
@@ -26,70 +50,73 @@ export default function CompraVenta() {
     };
 
     if (token && idMoneda) {
+      fetchMoneda();
       cargarAnuncios();
     }
-  }, [idMoneda, tipoSeleccionado, token]);
+  }, [idMoneda, tipoSeleccionado, token, navigate]);
 
   return (
-    <div style={{ maxWidth: 800, margin: "2rem auto", padding: "1rem" }}>
-      <h2>Anuncios para moneda #{idMoneda}</h2>
+    <Container maxWidth="md" sx={{ mt: 4 }}>
+      <Typography variant="h4" gutterBottom>
+        Anuncios de : {moneda ? moneda.nombre : `#${idMoneda}`}
+      </Typography>
 
-      <div style={{ marginBottom: "1rem" }}>
-        <button
+      {/* Botones de tipo */}
+      <ButtonGroup variant="contained" sx={{ mb: 3 }}>
+        <Button
           onClick={() => setTipoSeleccionado("compra")}
-          style={{
-            marginRight: "1rem",
-            backgroundColor: tipoSeleccionado === "compra" ? "#d3f9d8" : "#eee"
-          }}
+          color={tipoSeleccionado === "compra" ? "success" : "inherit"}
         >
           Compra
-        </button>
-        <button
+        </Button>
+        <Button
           onClick={() => setTipoSeleccionado("venta")}
-          style={{
-            backgroundColor: tipoSeleccionado === "venta" ? "#ffd6d6" : "#eee"
-          }}
+          color={tipoSeleccionado === "venta" ? "error" : "inherit"}
         >
           Venta
-        </button>
-      </div>
+        </Button>
+      </ButtonGroup>
 
+      {/* Lista de anuncios */}
       {anuncios.length === 0 ? (
-        <p>No hay anuncios disponibles.</p>
+        <Typography variant="body1">No hay anuncios disponibles.</Typography>
       ) : (
-        <div>
+        <Grid container spacing={3}>
           {anuncios.map((anuncio) => (
-            <div
-              key={anuncio.id}
-              style={{
-                border: "1px solid #ccc",
-                borderRadius: "8px",
-                padding: "1rem",
-                marginBottom: "1rem"
-              }}
-            >
-              <p><strong>Precio por unidad:</strong> {anuncio.precioPorUnidad}</p>
-              <p><strong>Cantidad:</strong> {anuncio.cantidad}</p>
-              <p><strong>Divisa:</strong> {anuncio.divisa}</p>
-              <button
-  onClick={() => navigate("/compraventa-detalle", { state: { anuncio } })}
-  style={{ marginTop: "0.5rem" }}
->
-  Ver Detalle
-</button>
+            <Grid item xs={12} sm={6} key={anuncio.id}>
+              <Card sx={{ height: "100%", display: "flex", flexDirection: "column" }}>
+                <CardContent>
+                  <Typography variant="h6" gutterBottom>
+                    {anuncio.divisa}
+                  </Typography>
+                  <Typography variant="body2"><strong>Precio por unidad:</strong> {anuncio.precioPorUnidad}</Typography>
+                  <Typography variant="body2"><strong>Cantidad:</strong> {anuncio.cantidad}</Typography>
+                </CardContent>
 
-              {anuncio.imagenPago ? (
-                <div style={{ marginTop: "1rem" }}>
-                  <p><strong>Como pagar:</strong></p>
-                  <img src={obtenerUrlImagenPago(anuncio.imagenPago)}
-                  alt="Como pagar"
-                  style={{ width: "100%", maxWidth: "300px", borderRadius: "4px" }}/>
-                </div>
-                ) : null}
-            </div>
+                {anuncio.imagenPago && (
+                  <CardMedia
+                    component="img"
+                    height="180"
+                    image={obtenerUrlImagenPago(anuncio.imagenPago)}
+                    alt="Como pagar"
+                    sx={{ objectFit: "contain", p: 1 }}
+                  />
+                )}
+
+                <CardActions>
+                  <Button
+                    size="small"
+                    variant="outlined"
+                    onClick={() => navigate("/compraventa-detalle", { state: { anuncio } })}
+                  >
+                    Ver Detalle
+                  </Button>
+                </CardActions>
+              </Card>
+            </Grid>
           ))}
-        </div>
+        </Grid>
       )}
-    </div>
+    </Container>
   );
 }

@@ -121,7 +121,7 @@ const crearTransaccion = async (req, res) => {
       comprobantePago: 'temporal',
       deBilleteraId: deBilletera.id,
       haciaBilleteraId: haciaBilletera.id,
-      estado: 'Pendiente'
+      estado: 'PENDIENTE'
     });
     // Renombrar imagen a: idTransaccion_nombreOriginal.ext
     const ext = path.extname(comprobante.originalname);
@@ -233,7 +233,7 @@ const aprobarTransaccion = async (req, res) => {
     }
         console.log(transaccion.estado," este es el estado de la transaccion")
 
-    if (transaccion.estado !== 'Pendiente') {
+    if (transaccion.estado !== 'PENDIENTE') {
       return res.status(400).json({ error: 'La transacción ya fue procesada' });
     }
 

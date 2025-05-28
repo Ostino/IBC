@@ -3,6 +3,20 @@ import { useNavigate } from "react-router-dom";
 import { crearTransferencia } from "../services/transaccionService";
 import { getBilleterasConMonedaUser } from "../services/billeteraService";
 import { getAllMonedas } from "../services/monedaService";
+
+import {
+  Container,
+  Typography,
+  TextField,
+  Button,
+  Select,
+  MenuItem,
+  InputLabel,
+  FormControl,
+  Box,
+  Paper,
+} from "@mui/material";
+
 export default function CrearTransferencia() {
   const [formData, setFormData] = useState({
     tipo: "TRANSFERENCIA",
@@ -17,27 +31,27 @@ export default function CrearTransferencia() {
   const token = sessionStorage.getItem("token");
   const navigate = useNavigate();
 
-useEffect(() => {
-  const cargarBilleteras = async () => {
-    try {
-      const [billeteras, monedas] = await Promise.all([
-        getBilleterasConMonedaUser(token),
-        getAllMonedas(token),
-      ]);
+  useEffect(() => {
+    const cargarBilleteras = async () => {
+      try {
+        const [billeteras, monedas] = await Promise.all([
+          getBilleterasConMonedaUser(token),
+          getAllMonedas(token),
+        ]);
 
-      const billeterasConMoneda = billeteras.map((b) => {
-        const moneda = monedas.find((m) => m.id === b.monedaId);
-        return { ...b, moneda };
-      });
+        const billeterasConMoneda = billeteras.map((b) => {
+          const moneda = monedas.find((m) => m.id === b.monedaId);
+          return { ...b, moneda };
+        });
 
-      setMisBilleteras(billeterasConMoneda);
-    } catch (error) {
-      console.error("Error al cargar billeteras o monedas:", error);
-    }
-  };
+        setMisBilleteras(billeterasConMoneda);
+      } catch (error) {
+        console.error("Error al cargar billeteras o monedas:", error);
+      }
+    };
 
-  if (token) cargarBilleteras();
-}, [token]);
+    if (token) cargarBilleteras();
+  }, [token]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -63,75 +77,102 @@ useEffect(() => {
   };
 
   return (
-    <div style={{ maxWidth: 600, margin: "2rem auto" }}>
-      <h2>Crear Transferencia</h2>
-      <form onSubmit={handleSubmit} encType="multipart/form-data">
-        <label>
-          Monto:
-          <input
+    <Container maxWidth="sm" sx={{ mt: 4, mb: 4 }}>
+      <Paper elevation={3} sx={{ p: 4 }}>
+        <Typography variant="h5" gutterBottom>
+          Crear Transferencia
+        </Typography>
+
+        <Box
+          component="form"
+          onSubmit={handleSubmit}
+          encType="multipart/form-data"
+          noValidate
+          sx={{ mt: 2 }}
+        >
+          <TextField
+            label="Monto"
             type="number"
+            required
+            fullWidth
+            margin="normal"
             value={formData.monto}
-            onChange={(e) => setFormData({ ...formData, monto: e.target.value })}
-            required
-          />
-        </label>
-        <br /><br />
-
-        <label>
-          Descripción del pago:
-          <input
-            type="text"
-            value={formData.descripcionPago}
-            onChange={(e) => setFormData({ ...formData, descripcionPago: e.target.value })}
-            required
-          />
-        </label>
-        <br /><br />
-
-        <label>
-          De billetera:
-          <select
-            value={formData.deBilleteraId}
-            onChange={(e) => setFormData({ ...formData, deBilleteraId: e.target.value })}
-            required
-          >
-            <option value="">Seleccione una billetera</option>
-            {misBilleteras.map((b) => (
-  <option key={b.id} value={b.id}>
-    {b.moneda?.nombre || "Moneda desconocida"} (Saldo: {b.saldo})
-  </option>
-))}
-
-          </select>
-        </label>
-        <br /><br />
-
-        <label>
-          Hacia billetera (ID):
-          <input
-            type="text"
-            value={formData.haciaBilleteraId}
-            onChange={(e) => setFormData({ ...formData, haciaBilleteraId: e.target.value })}
-            required
-          />
-        </label>
-        <br /><br />
-
-        <label>
-          Comprobante de pago:
-          <input
-            type="file"
-            accept="image/*"
             onChange={(e) =>
-              setFormData({ ...formData, comprobantePago: e.target.files[0] })
+              setFormData({ ...formData, monto: e.target.value })
             }
-            required
+            inputProps={{ min: 0, step: "0.01" }}
           />
-        </label>
-        <br /><br />
 
-        <button type="submit">Enviar Transferencia</button>
-      </form>
-    </div>
+          <TextField
+            label="Descripción del pago"
+            required
+            fullWidth
+            margin="normal"
+            value={formData.descripcionPago}
+            onChange={(e) =>
+              setFormData({ ...formData, descripcionPago: e.target.value })
+            }
+          />
+
+          <FormControl fullWidth margin="normal" required>
+            <InputLabel id="de-billetera-label">De billetera</InputLabel>
+            <Select
+              labelId="de-billetera-label"
+              value={formData.deBilleteraId}
+              label="De billetera"
+              onChange={(e) =>
+                setFormData({ ...formData, deBilleteraId: e.target.value })
+              }
+            >
+              <MenuItem value="">
+                <em>Seleccione una billetera</em>
+              </MenuItem>
+              {misBilleteras.map((b) => (
+                <MenuItem key={b.id} value={b.id}>
+                  {b.moneda?.nombre || "Moneda desconocida"} (Saldo: {b.saldo})
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+
+          <TextField
+            label="Hacia billetera (ID)"
+            required
+            fullWidth
+            margin="normal"
+            value={formData.haciaBilleteraId}
+            onChange={(e) =>
+              setFormData({ ...formData, haciaBilleteraId: e.target.value })
+            }
+          />
+
+          <Box sx={{ mt: 2, mb: 3 }}>
+            <InputLabel htmlFor="comprobantePago" required>
+              Comprobante de pago
+            </InputLabel>
+            <input
+              id="comprobantePago"
+              type="file"
+              accept="image/*"
+              required
+              onChange={(e) =>
+                setFormData({ ...formData, comprobantePago: e.target.files[0] })
+              }
+              style={{ marginTop: 8 }}
+            />
+          </Box>
+
+          <Button
+            type="submit"
+            variant="contained"
+            color="primary"
+            fullWidth
+            size="large"
+          >
+            Enviar Transferencia
+          </Button>
+        </Box>
+      </Paper>
+    </Container>
   );
 }
