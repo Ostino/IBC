@@ -61,16 +61,6 @@ export default function Profile() {
     fetchData();
   }, [navigate, token]);
 
-  const handleLogout = async () => {
-    try {
-      await logout(token);
-    } catch (err) {
-      console.error("Error al cerrar sesión:", err);
-    } finally {
-      sessionStorage.removeItem("token");
-      navigate("/login");
-    }
-  };
 
   const handleLogoutAll = async () => {
     try {
@@ -96,9 +86,6 @@ export default function Profile() {
         <Box mt={3}>
           <Stack spacing={2} direction="column">
             <Stack direction="row" spacing={2} flexWrap="wrap">
-              <Button variant="contained" color="error" onClick={handleLogout}>
-                Cerrar sesión
-              </Button>
               <Button variant="contained" color="error" onClick={handleLogoutAll}>
                 Cerrar todas las sesiones
               </Button>
@@ -112,9 +99,6 @@ export default function Profile() {
               </Button>
             </Stack>
             <Stack direction="row" spacing={2} flexWrap="wrap">
-              <Button variant="contained" color="success" onClick={() => navigate("/transacciones")}>
-                Ver transacciones
-              </Button>
               <Button variant="contained" color="success" onClick={() => navigate("/crear-transferencia")}>
                 Hacer transferencia
               </Button>

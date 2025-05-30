@@ -14,6 +14,7 @@ import CompraVentaDetalle from "./pages/CVDetalle";
 import Transacciones from "./pages/Transacciones";
 import CrearBilletera from "./pages/CrearBilletera";
 import CrearTransferencia from "./pages/CrearTransferencia";
+import Layout from "./components/Layout";
 
 const theme = createTheme({
   palette: {
@@ -30,6 +31,15 @@ export default function App() {
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <Routes>
+        <Route element={<Layout />}>
+        <Route path="/profile" element={<Profile />} />
+        <Route path="/registrar-anuncio" element={<RegistrarAnuncio />} />
+        <Route path="/compraventa/:idMoneda" element={<CompraVenta />} />
+        <Route path="/compraventa-detalle" element={<CompraVentaDetalle />} />
+        <Route path="/transacciones" element={<Transacciones />} />
+        <Route path="/crear-billetera" element={<CrearBilletera />} />
+        <Route path="/crear-transferencia" element={<CrearTransferencia />} />
+        </Route>
         <Route path="/" element={<Navigate to="/login" />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
