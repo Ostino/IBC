@@ -22,18 +22,18 @@ const Anuncio = sequelize.define('Anuncio', {
   disponible: {
     type: DataTypes.BOOLEAN,
     allowNull: false,
-    defaultValue: true // Por defecto está disponible
+    defaultValue: true
     },
   descripcionPago: { 
     type: DataTypes.TEXT 
-    },  // Texto explicando método de pago
+    },
   imagenPago: { 
     type: DataTypes.TEXT 
-    },       // Imagen o URL (base64 o string)
+    },
   divisa: { 
     type: DataTypes.STRING, 
     allowNull: false 
-    } // moneda en texto para fácil acceso
+    }
 });
 
 module.exports = Anuncio;

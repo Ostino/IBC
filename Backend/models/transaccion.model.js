@@ -20,7 +20,7 @@ const Transaccion = sequelize.define('Transaccion', {
     },
   comprobantePago: { 
     type: DataTypes.STRING 
-    }, // Imagen o texto del comprobante
+    },
   estado: {
     type: DataTypes.ENUM('PENDIENTE', 'CANCELADO', 'ACEPTADO'),
     allowNull: false,
