@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { login } from "../services/authService";
+import FondoEstrellas from "../components/FondoEstrellas";
 
 import {
   Container,
@@ -34,6 +35,8 @@ export default function Login() {
   };
 
   return (
+    <>
+        <FondoEstrellas />
     <Container maxWidth="xs" sx={{ mt: 8 }}>
       <Typography variant="h4" component="h1" gutterBottom>
         Iniciar sesión
@@ -80,5 +83,6 @@ export default function Login() {
         ¿No tienes cuenta? Regístrate
       </Button>
     </Container>
+    </>
   );
 }

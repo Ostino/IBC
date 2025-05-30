@@ -1,6 +1,5 @@
 const Usuario = require('../models/usuario.model');
 
-// GET /api/usuarios/me
 const getUsuarioActual = async (req, res) => {
   try {
     const usuario = req.user;
@@ -15,7 +14,6 @@ const getUsuarioActual = async (req, res) => {
   }
 };
 
-// GET /api/usuarios
 const getUsuarios = async (req, res) => {
   try {
     const usuarios = await Usuario.findAll({
@@ -27,7 +25,6 @@ const getUsuarios = async (req, res) => {
   }
 };
 
-// GET /api/usuarios/:id
 const getUsuarioPorId = async (req, res) => {
   const { id } = req.params;
   try {
@@ -44,6 +41,7 @@ const getUsuarioPorId = async (req, res) => {
     res.status(500).json({ error: 'Error al obtener usuario' });
   }
 };
+
 const hacerAdmin = async (req, res) => {
   const { id } = req.params;
 

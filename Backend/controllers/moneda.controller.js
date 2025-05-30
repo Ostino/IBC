@@ -1,6 +1,5 @@
 const { Moneda } = require('../models');
 
-// Crear moneda
 const crearMoneda = async (req, res) => {
   try {
     const { codigo, nombre, valueInSus } = req.body;
@@ -17,7 +16,6 @@ const crearMoneda = async (req, res) => {
   }
 };
 
-// Obtener todas las monedas
 const obtenerMonedas = async (req, res) => {
   try {
     const monedas = await Moneda.findAll();
@@ -27,7 +25,6 @@ const obtenerMonedas = async (req, res) => {
   }
 };
 
-// Obtener moneda por ID
 const obtenerMonedaPorId = async (req, res) => {
   try {
     const { id } = req.params;
@@ -43,7 +40,6 @@ const obtenerMonedaPorId = async (req, res) => {
   }
 };
 
-// Actualizar moneda
 const actualizarMoneda = async (req, res) => {
   const { id } = req.params;
   const { codigo, nombre, valueInSus } = req.body;
@@ -54,7 +50,6 @@ const actualizarMoneda = async (req, res) => {
       return res.status(404).json({ error: 'Moneda no encontrada' });
     }
 
-    // Validar que el nuevo código no esté en uso por otra moneda
     if (codigo && codigo !== moneda.codigo) {
       const codigoExistente = await Moneda.findOne({
         where: { codigo }
@@ -79,7 +74,6 @@ const actualizarMoneda = async (req, res) => {
   }
 };
 
-// Eliminar moneda
 const eliminarMoneda = async (req, res) => {
   try {
     const { id } = req.params;

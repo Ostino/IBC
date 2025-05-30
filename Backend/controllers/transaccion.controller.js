@@ -1,4 +1,3 @@
-const { Console } = require('console');
 const { Transaccion, Anuncio, Billetera, Usuario,Moneda } = require('../models');
 const fs = require('fs');
 const path = require('path');
@@ -31,9 +30,9 @@ const buscarTransaccionPorId = async (id) => {
       ]
     });
 
-    return transaccion; // Retorna null si no existe
+    return transaccion; 
   } catch (error) {
-    console.error('❌ Error al buscar transacción por ID:', error);
+    console.error('Error al buscar transacción por ID:', error);
     throw error;
   }
 };
@@ -44,21 +43,17 @@ const hacerTransaccion = async (transaccion) => {
   const billeteraOrigen = transaccion.deBilletera;
   const billeteraDestino = transaccion.haciaBilletera;
 
-  // Verifica que ambas billeteras existan
   if (!billeteraOrigen || !billeteraDestino) {
     throw new Error('Faltan datos de billetera para realizar la transacción.');
   }
 
-  // Verifica saldo suficiente
   if (billeteraOrigen.saldo < monto) {
     throw new Error('Saldo insuficiente en la billetera de origen.');
   }
 
-  // Realiza la operación
   billeteraOrigen.saldo -= monto;
   billeteraDestino.saldo += monto;
 
-  // Guarda los cambios
   await Promise.all([
     billeteraOrigen.save(),
     billeteraDestino.save()
@@ -75,7 +70,7 @@ const crearTransaccion = async (req, res) => {
   console.log('📥 anuncioId recibido:', req.body.anuncioId);
   try {
     const { anuncioId } = req.body;
-    const comprobante = req.file; // imagen
+    const comprobante = req.file;
 
     if (!comprobante) {
       return res.status(400).json({ error: 'Debes subir una imagen de comprobante' });
@@ -88,7 +83,6 @@ const crearTransaccion = async (req, res) => {
       return res.status(404).json({ error: 'Anuncio no encontrado' });
     }
 
-    // Extraer datos del anuncio
     const vendedorId = anuncios.UsuarioId;
     const descripcionPago = anuncios.descripcionPago;
     const precioPorUnidad = anuncios.precioPorUnidad;
@@ -97,15 +91,12 @@ const crearTransaccion = async (req, res) => {
     const tipo = anuncios.tipo;
     const monedaId = anuncios.MonedaId;
 
-    // Comprador
     const compradorId = req.user.id;
 
-    // Obtener deBilleteraId del comprador
       console.log('🎯 monedaId del comprador:', monedaId);
 
     const deBilletera = await getBilleteraDelUsuarioPorMoneda(compradorId, monedaId);
 
-    // Obtener haciaBilleteraId del vendedor
       console.log('🎯 monedaId del vendedor:', monedaId);
 
     const haciaBilletera = await getBilleteraDelUsuarioPorMoneda(vendedorId, monedaId);
@@ -123,7 +114,6 @@ const crearTransaccion = async (req, res) => {
       haciaBilleteraId: haciaBilletera.id,
       estado: 'PENDIENTE'
     });
-    // Renombrar imagen a: idTransaccion_nombreOriginal.ext
     const ext = path.extname(comprobante.originalname);
     const nuevoNombre = `${nuevaTransferencia.id}_${comprobante.originalname}`;
     const nuevaRuta = path.join(
@@ -133,7 +123,6 @@ const crearTransaccion = async (req, res) => {
 
     fs.renameSync(comprobante.path, nuevaRuta);
 
-    // Actualizar transacción con el nombre correcto del archivo
     nuevaTransferencia.comprobantePago = nuevoNombre;
 
     await nuevaTransferencia.save();
@@ -217,7 +206,7 @@ const getTransaccionPorId = async (req, res) => {
 
     res.json(transaccion);
   } catch (error) {
-    console.error('❌ Error al obtener la transacción:', error);
+    console.error('Error al obtener la transacción:', error);
     res.status(500).json({ error: 'Error al obtener la transacción' });
   }
 };
@@ -227,7 +216,6 @@ const aprobarTransaccion = async (req, res) => {
     console.log(req.params)
     const { id } = req.params;
     const transaccion = await buscarTransaccionPorId(id);
-    //console.log("esta es la transaccion ",transaccion)
     if (!transaccion) {
       return res.status(404).json({ error: 'Transacción no encontrada' });
     }
@@ -237,16 +225,14 @@ const aprobarTransaccion = async (req, res) => {
       return res.status(400).json({ error: 'La transacción ya fue procesada' });
     }
 
-    // Ejecutar la transferencia de saldos
     await hacerTransaccion(transaccion);
 
-    // Marcar la transacción como aprobada
     transaccion.estado = 'ACEPTADO';
     await transaccion.save();
 
     res.json({ mensaje: 'Transacción aprobada y ejecutada con éxito', transaccion });
   } catch (error) {
-    console.error('❌ Error al aprobar transacción:', error);
+    console.error('Error al aprobar transacción:', error);
     res.status(500).json({ error: error.message });
   }
 };
@@ -282,7 +268,6 @@ const crearTransferencia = async (req, res) => {
 
     const compradorId = req.user.id;
 
-    // Obtener vendedor desde la billetera de destino
     const billeteraDestino = await Billetera.findByPk(haciaBilleteraId);
     if (!billeteraDestino) {
       return res.status(404).json({ error: 'Billetera destino no encontrada' });
@@ -290,7 +275,6 @@ const crearTransferencia = async (req, res) => {
 
     const vendedorId = billeteraDestino.usuarioId;
 
-    // Crear la transacción (sin comprobante aún)
     const transaccion = await Transaccion.create({
       tipo: 'TRANSFERENCIA',
       monto,
@@ -299,19 +283,15 @@ const crearTransferencia = async (req, res) => {
       haciaBilleteraId,
       compradorId,
       vendedorId
-      // estado queda como "Pendiente" por defecto
     });
 
-    // Si hay imagen de comprobante, renombrarla
     if (req.file) {
       const ext = path.extname(req.file.originalname);
       const nuevoNombre = `${transaccion.id}_comprobante${ext}`;
       const nuevaRuta = path.join('ImagenesComprobante', nuevoNombre);
 
-      // Renombrar archivo en el sistema
       fs.renameSync(req.file.path, nuevaRuta);
 
-      // Guardar nuevo nombre en la transacción
       transaccion.comprobantePago = nuevoNombre;
       await transaccion.save();
     }
@@ -344,7 +324,7 @@ const rechazarTransferencia = async (req, res) => {
 
 const aprobarTransferencia = async (req, res) => {
   const { id } = req.params;
-  console.log("✅ Iniciando aprobación de transferencia con ID:", id);
+  console.log("Iniciando aprobación de transferencia con ID:", id);
 
   try {
     const transaccion = await Transaccion.findByPk(id, {
@@ -380,7 +360,6 @@ const aprobarTransferencia = async (req, res) => {
     let montoFinal = Number(transaccion.monto);
     const montoOriginal = Number(transaccion.monto);
 
-    // Si son monedas distintas, se convierte el monto
     if (deBilletera.monedaId !== haciaBilletera.monedaId) {
       const monedaOrigen = deBilletera.Moneda;
       const monedaDestino = haciaBilletera.Moneda;
@@ -392,39 +371,32 @@ const aprobarTransferencia = async (req, res) => {
       const valorOrigen = Number(monedaOrigen.valueInSus);
       const valorDestino = Number(monedaDestino.valueInSus);
 
-      console.log("💱 Moneda origen:", monedaOrigen.nombre, "| valorEnSus:", valorOrigen);
-      console.log("💱 Moneda destino:", monedaDestino.nombre, "| valorEnSus:", valorDestino);
-      console.log("💸 Monto original:", montoOriginal);
-
       if (isNaN(valorOrigen) || isNaN(valorDestino)) {
         return res.status(400).json({ error: 'Valores de conversión inválidos' });
       }
 
       montoFinal = (montoOriginal * valorOrigen) / valorDestino;
 
-      console.log("✅ Monto convertido:", montoFinal);
+      console.log("Monto convertido:", montoFinal);
     }
 
-    // Verificar saldo suficiente
     if (deBilletera.saldo < montoOriginal) {
       return res.status(400).json({ error: 'Saldo insuficiente en la billetera de origen' });
     }
 
-    // Realizar la transferencia
     deBilletera.saldo -= montoOriginal;
     haciaBilletera.saldo += montoFinal;
 
-    console.log("📉 Nuevo saldo en billetera origen:", deBilletera.saldo);
-    console.log("📈 Nuevo saldo en billetera destino:", haciaBilletera.saldo);
+    console.log("Nuevo saldo en billetera origen:", deBilletera.saldo);
+    console.log("Nuevo saldo en billetera destino:", haciaBilletera.saldo);
 
-    // Guardar cambios
     await deBilletera.save();
     await haciaBilletera.save();
 
     transaccion.estado = 'APROBADO';
     await transaccion.save();
 
-    console.log("✅ Transferencia aprobada y guardada");
+    console.log("Transferencia aprobada y guardada");
 
     res.json({ mensaje: 'Transferencia aprobada con éxito', transaccion });
   } catch (error) {

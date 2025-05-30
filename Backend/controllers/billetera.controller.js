@@ -1,18 +1,17 @@
 const { Billetera } = require('../models');
 
-// 1. Crear billetera
 const crearBilletera = async (req, res) => {
   try {
-    const usuarioId = req.user.id;  // Extrae correctamente el id del usuario del token
-    const { monedaId, saldo } = req.body;  // Usa monedaId en minúscula para coincidir con el modelo
+    const usuarioId = req.user.id;  
+    const { monedaId, saldo } = req.body; 
 
     if (!monedaId) {
       return res.status(400).json({ error: 'monedaId es obligatorio' });
     }
 
     const nuevaBilletera = await Billetera.create({
-      usuarioId,   // clave foránea en minúscula
-      monedaId,    // clave foránea en minúscula
+      usuarioId,
+      monedaId,
       saldo: saldo || 0
     });
 
@@ -24,7 +23,6 @@ const crearBilletera = async (req, res) => {
   }
 };
 
-// 2. Listar todas las billeteras
 const obtenerBilleteras = async (_req, res) => {
   try {
     const billeteras = await Billetera.findAll();
@@ -34,7 +32,6 @@ const obtenerBilleteras = async (_req, res) => {
   }
 };
 
-// 3. Obtener una billetera por ID
 const obtenerBilleterasDelUsuario = async (req, res) => {
   try {
     const { id } = req.params;
@@ -46,7 +43,6 @@ const obtenerBilleterasDelUsuario = async (req, res) => {
   }
 };
 
-// 4. Actualizar billetera
 const actualizarBilletera = async (req, res) => {
   try {
     const { id } = req.params;
@@ -62,7 +58,6 @@ const actualizarBilletera = async (req, res) => {
   }
 };
 
-// 5. Eliminar billetera
 const eliminarBilletera = async (req, res) => {
   try {
     const { id } = req.params;
@@ -86,6 +81,7 @@ const obtenerBilleterasDelUsuarioMe = async (req, res) => {
     res.status(500).json({ error: 'Error al obtener billeteras del usuario', details: err.message });
   }
 };
+
 module.exports = {
   crearBilletera,
   obtenerBilleteras,

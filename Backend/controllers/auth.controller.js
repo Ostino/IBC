@@ -54,7 +54,6 @@ const login = async (req, res) => {
   }
 };
 
-// ✅ Cerrar sesión actual
 const logout = async (req, res) => {
   try {
     const tokenString = req.headers.authorization.split(' ')[1];
@@ -69,7 +68,6 @@ const logout = async (req, res) => {
   }
 };
 
-// ✅ Cerrar todas las sesiones del usuario
 const logoutAll = async (req, res) => {
   try {
     const usuario = req.user;
