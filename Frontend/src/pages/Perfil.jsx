@@ -1,22 +1,11 @@
 import { useEffect, useState } from "react";
 import { useNavigate, Link as RouterLink } from "react-router-dom";
-import {
-  Container,
-  Typography,
-  Button,
-  Stack,
-  List,
-  ListItem,
-  ListItemText,
-  Link,
-  Paper,
-  Box
-} from "@mui/material";
-
+import {Container,Typography,Button,Stack,List,ListItem,ListItemText,Paper,Box,Grid} from "@mui/material";
 import { getProfile } from "../services/usuarioService";
-import { logout, logoutAll } from "../services/authService";
+import { logoutAll } from "../services/authService";
 import { getAllMonedas } from "../services/monedaService";
 import { getBilleterasConMonedaUser } from "../services/billeteraService";
+import FondoEstrellas from "../components/FondoEstrellas";
 
 export default function Profile() {
   const [user, setUser] = useState(null);
@@ -76,38 +65,64 @@ export default function Profile() {
   if (!user) return <Typography variant="body1" textAlign="center">Cargando perfil...</Typography>;
 
   return (
-    <Container maxWidth="sm" sx={{ mt: 4 }}>
-      <Paper elevation={3} sx={{ p: 3 }}>
+     <>
+    <FondoEstrellas />
+    <Container maxWidth="sm" sx={{padding: 4}}>
+      
+      <Paper elevation={3} sx={{ p: 3,mb: 4,backgroundColor: "rgba(0, 0, 0, 0.6)",borderRadius: 2,color: "white",}}>
         <Typography variant="h4" gutterBottom>Perfil</Typography>
         <Typography><strong>ID:</strong> {user.id}</Typography>
         <Typography><strong>Usuario:</strong> {user.username}</Typography>
         <Typography><strong>Email:</strong> {user.email}</Typography>
 
         <Box mt={3}>
-          <Stack spacing={2} direction="column">
-            <Stack direction="row" spacing={2} flexWrap="wrap">
-              <Button variant="contained" color="error" onClick={handleLogoutAll}>
-                Cerrar todas las sesiones
-              </Button>
-            </Stack>
-            <Stack direction="row" spacing={2} flexWrap="wrap">
-              <Button variant="contained" onClick={() => navigate("/crear-billetera")}>
-                Crear billetera
-              </Button>
-              <Button variant="contained" onClick={() => navigate("/registrar-anuncio")}>
-                Registrar anuncio
-              </Button>
-            </Stack>
-            <Stack direction="row" spacing={2} flexWrap="wrap">
-              <Button variant="contained" color="success" onClick={() => navigate("/crear-transferencia")}>
-                Hacer transferencia
-              </Button>
-            </Stack>
-          </Stack>
-        </Box>
+  <Grid container spacing={2}>
+    <Grid item xs={12} sm={6}>
+      <Button
+        fullWidth
+        variant="contained"
+        color="error"
+        onClick={handleLogoutAll}
+      >
+        Cerrar todas las sesiones
+      </Button>
+    </Grid>
+    <Grid item xs={12} sm={6}>
+      <Button
+        fullWidth
+        variant="contained"
+        color="ochre"
+        onClick={() => navigate("/crear-billetera")}
+      >
+        Crear billetera
+      </Button>
+    </Grid>
+    <Grid item xs={12} sm={6}>
+      <Button
+        fullWidth
+        variant="contained"
+        color="ochre"
+        onClick={() => navigate("/registrar-anuncio")}
+      >
+        Registrar anuncio
+      </Button>
+    </Grid>
+    <Grid item xs={12} sm={6}>
+      <Button
+        fullWidth
+        variant="contained"
+        color="success"
+        onClick={() => navigate("/crear-transferencia")}
+        sx={{ color: "white" }}
+      >
+        Hacer transferencia
+      </Button>
+    </Grid>
+  </Grid>
+</Box>
       </Paper>
 
-      <Paper elevation={3} sx={{ p: 3, mt: 4 }}>
+      <Paper elevation={3} sx={{ p: 3,mb: 4,backgroundColor: "rgba(0, 0, 0, 0.6)",borderRadius: 2,color: "white",}}>
         <Typography variant="h5" gutterBottom>Mis Billeteras</Typography>
         {billeteras.length === 0 ? (
           <Typography>No tienes billeteras.</Typography>
@@ -115,9 +130,10 @@ export default function Profile() {
           <List>
             {billeteras.map((b) => (
               <ListItem key={b.id}>
-                <ListItemText
+                <ListItemText 
                   primary={`${b.moneda.nombre} (ID: ${b.id})`}
-                  secondary={`Saldo: ${b.saldo}`}
+                  secondary={`Saldo: ${b.saldo}`} 
+                  sx={{ color: "white" }}
                 />
               </ListItem>
             ))}
@@ -125,7 +141,7 @@ export default function Profile() {
         )}
       </Paper>
 
-      <Paper elevation={3} sx={{ p: 3, mt: 4, mb: 4 }}>
+      <Paper elevation={3} sx={{ p: 3,mb: 4,backgroundColor: "rgba(0, 0, 0, 0.6)",borderRadius: 2,color: "white", }}>
   <Typography variant="h5" gutterBottom>Monedas disponibles</Typography>
   <Box display="flex" flexWrap="wrap" gap={2}>
     {monedas.map((moneda) => {
@@ -164,6 +180,7 @@ export default function Profile() {
   </Box>
 </Paper>
     </Container>
+    </>
   );
 }
 

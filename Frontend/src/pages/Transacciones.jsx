@@ -1,24 +1,8 @@
 import { useEffect, useState } from "react";
-import {
-  getMisTransferencias,
-  aprobarTransaccion,
-  rechazarTransaccion,
-  aprobarTransferencia,
-  cancelarTransferencia,
-} from "../services/transaccionService";
-
-import {
-  Container,
-  Typography,
-  List,
-  ListItem,
-  ListItemText,
-  ListItemSecondaryAction,
-  Button,
-  Box,
-  Divider,
-  Paper,
-} from "@mui/material";
+import {getMisTransferencias,aprobarTransaccion,rechazarTransaccion,
+  aprobarTransferencia,cancelarTransferencia,} from "../services/transaccionService";
+import {Container,Typography,List,ListItem,ListItemText,Button,Box,Paper,} from "@mui/material";
+import FondoEstrellas from "../components/FondoEstrellas";
 
 export default function Transacciones() {
   const [transacciones, setTransacciones] = useState([]);
@@ -80,6 +64,8 @@ export default function Transacciones() {
   };
 
   return (
+     <>
+        <FondoEstrellas />
     <Container maxWidth="md" sx={{ mt: 4, mb: 4 }}>
       <Typography variant="h4" gutterBottom>
         Mis Transacciones
@@ -90,32 +76,32 @@ export default function Transacciones() {
       ) : (
         <List>
           {transacciones.map((t) => (
-            <Paper key={t.id} sx={{ p: 2, mb: 2 }}>
+            <Paper key={t.id} sx={{ p: 2, mb: 2,backgroundColor: "rgba(0, 0, 0, 0.6)",borderRadius: 2,color: "white", }}>
               <ListItem alignItems="flex-start" disableGutters>
                 <ListItemText
                   primary={`ID: ${t.id} — Tipo: ${t.tipo} — Estado: ${t.estado}`}
                   secondary={
                     <>
-                      <Typography variant="body2" color="text.primary">
+                      <Typography variant="body2" color="white">
                         Monto: {t.monto}
                       </Typography>
-                      <Typography variant="body2" color="text.primary">
+                      <Typography variant="body2" color="white">
                         Descripción: {t.descripcionPago}
                       </Typography>
                       {t.Anuncio && (
-                        <Typography variant="body2" color="text.primary">
+                        <Typography variant="body2" color="white">
                           Moneda: {t.Anuncio.divisa}
                         </Typography>
                       )}
-                      <Typography variant="body2" color="text.primary">
+                      <Typography variant="body2" color="white">
                         Comprador ID: {t.compradorId}
                       </Typography>
-                      <Typography variant="body2" color="text.primary">
+                      <Typography variant="body2" color="white">
                         Vendedor ID: {t.vendedorId}
                       </Typography>
                       {t.comprobantePago && (
                         <Box mt={2}>
-                          <Typography variant="body2" fontWeight="bold" gutterBottom>
+                          <Typography variant="body2" fontWeight="bold" color="white" gutterBottom>
                             Comprobante:
                           </Typography>
                           <img
@@ -131,7 +117,7 @@ export default function Transacciones() {
               </ListItem>
 
               {t.estado === "PENDIENTE" && (
-                <Box mt={2} display="flex" gap={2}>
+                <Box mt={2} display="flex" gap={2}color="white">
                   {["COMPRA", "VENTA"].includes(t.tipo) && (
                     <>
                       <Button
@@ -176,5 +162,6 @@ export default function Transacciones() {
         </List>
       )}
     </Container>
+     </>
   );
 }

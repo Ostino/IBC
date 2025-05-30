@@ -18,13 +18,30 @@ import Layout from "./components/Layout";
 
 const theme = createTheme({
   palette: {
+    mode: 'dark',
     primary: { main: '#1976d2' },
     secondary: { main: '#dc004e' },
+    background: {
+      default: '#000000',
+      paper: '#121212',
+    },
+    text: {
+      primary: '#ffffff',
+      secondary: '#cccccc',
+    },
+    ochre: {
+      main: '#E3D026',
+      light: '#E9DB5D',
+      dark: '#A29415',
+      contrastText: '#242105',
+    },
+
   },
   typography: {
     fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
   },
 });
+
 
 export default function App() {
   return (
