@@ -15,7 +15,7 @@ const requireUser = async (req, res, next) => {
       where: { token: tokenStr },
       include: {
       model: Usuario,
-      attributes: ['id','rol', 'username', 'email']  // opcional, para limitar campos
+      attributes: ['id','rol', 'username', 'email']
       }
     });
 
