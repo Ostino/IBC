@@ -4,7 +4,6 @@ const monedaController = require('../controllers/moneda.controller');
 const requireUser = require('../middlewares/requiredUser');
 const requireAdmin = require('../middlewares/requiredAdmin');
 
-// CRUD completo, protegido para admins
 router.post('/', requireUser, requireAdmin, monedaController.crearMoneda);
 router.get('/', requireUser,monedaController.obtenerMonedas);
 router.get('/:id', requireUser,monedaController.obtenerMonedaPorId);

@@ -1,4 +1,3 @@
-// index.js
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
@@ -11,7 +10,7 @@ const anuncioRoutes = require('./routes/anuncio.route');
 const billeteraRoutes = require('./routes/billetera.route');
 const transaccionRoutes = require('./routes/transaccion.route');
 
-require('./models'); // Importa modelos para que sequelize.sync() los reconozca
+require('./models');
 
 app.use(express.json());
 app.use(cors());
@@ -23,10 +22,10 @@ app.get('/', (req, res) => {
 async function iniciarServidor() {
   try {
     await sequelize.authenticate();
-    console.log('✅ Conexión exitosa a la base de datos');
+    console.log('Conexión exitosa a la base de datos');
 
     //await sequelize.sync({ alter: true }); // Usamos alter para actualizar sin borrar dato
-    console.log('✅ Tablas sincronizadas correctamente');
+    console.log('Tablas sincronizadas correctamente');
 
     const [resultados] = await sequelize.query(
       "SELECT name FROM sqlite_master WHERE type='table';"
@@ -36,10 +35,10 @@ async function iniciarServidor() {
     //await asignarAdmin('oscar@email.com');
     const PORT = 3000;
     app.listen(PORT, () => {
-      console.log(`🚀 Servidor backend corriendo en http://localhost:${PORT}`);
+      console.log(`Servidor backend corriendo en http://localhost:${PORT}`);
     });
   } catch (error) {
-    console.error('❌ Error al conectar con la base de datos:', error);
+    console.error('Error al conectar con la base de datos:', error);
   }
 }
 iniciarServidor();
@@ -61,11 +60,11 @@ async function asignarAdmin(email) {
     if (usuario.rol !== 1) {
       usuario.rol = 1;
       await usuario.save();
-      console.log(`✅ El usuario ${usuario.username} ahora es admin (rol 1)`);
+      console.log(`El usuario ${usuario.username} ahora es admin (rol 1)`);
     } else {
-      console.log(`ℹ️ El usuario ${usuario.username} ya es admin`);
+      console.log(`ℹEl usuario ${usuario.username} ya es admin`);
     }
   } else {
-    console.log('❌ No se encontró el usuario para hacer admin');
+    console.log('No se encontró el usuario para hacer admin');
   }
 }

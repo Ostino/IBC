@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const authController = require('../controllers/auth.controller');
-const requireUser = require('../middlewares/requiredUser'); // importa tu middleware
+const requireUser = require('../middlewares/requiredUser');
 
 router.post('/register', authController.register);
 router.post('/login', authController.login);
