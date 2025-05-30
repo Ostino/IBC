@@ -38,26 +38,59 @@ const buscarTransaccionPorId = async (id) => {
 };
 
 const hacerTransaccion = async (transaccion) => {
-  const monto = transaccion.monto;
+  const monto = Number(transaccion.monto);
+  const tipo = transaccion.tipo;
 
   const billeteraOrigen = transaccion.deBilletera;
   const billeteraDestino = transaccion.haciaBilletera;
+
+  console.log("Procesando transacción:");
+  console.log("Tipo:", tipo);
+  console.log("Monto:", monto);
+  console.log("Origen ID:", billeteraOrigen?.id);
+  console.log("Destino ID:", billeteraDestino?.id);
 
   if (!billeteraOrigen || !billeteraDestino) {
     throw new Error('Faltan datos de billetera para realizar la transacción.');
   }
 
-  if (billeteraOrigen.saldo < monto) {
-    throw new Error('Saldo insuficiente en la billetera de origen.');
+  if (billeteraOrigen.id === billeteraDestino.id) {
+    console.log("Misma billetera origen y destino. Transacción ignorada.");
+    return {
+      mensaje: 'Transacción ignorada: origen y destino son iguales.',
+      deBilletera: billeteraOrigen,
+      haciaBilletera: billeteraDestino
+    };
   }
 
-  billeteraOrigen.saldo -= monto;
-  billeteraDestino.saldo += monto;
+  if (tipo === 'COMPRA') {
+    console.log("billeteraOrigen.saldo = ",billeteraOrigen.saldo)
+    console.log("monto = ",monto)
+    if (billeteraOrigen.saldo < monto) {
+      throw new Error('Saldo insuficiente en la billetera de origen.');
+    }
+
+    billeteraOrigen.saldo -= monto;
+    billeteraDestino.saldo += monto;
+
+  } else if (tipo === 'VENTA') {
+    if (billeteraDestino.saldo < monto) {
+      throw new Error('Saldo insuficiente en la billetera destino para una venta.');
+    }
+
+    billeteraOrigen.saldo += monto;
+    billeteraDestino.saldo -= monto;
+
+  } else {
+    throw new Error('Tipo de transacción inválido. Debe ser COMPRA o VENTA.');
+  }
 
   await Promise.all([
     billeteraOrigen.save(),
     billeteraDestino.save()
   ]);
+
+  console.log("Transacción completada.");
 
   return {
     mensaje: 'Transacción realizada con éxito',

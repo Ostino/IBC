@@ -3,13 +3,18 @@ import {getMisTransferencias,aprobarTransaccion,rechazarTransaccion,
   aprobarTransferencia,cancelarTransferencia,} from "../services/transaccionService";
 import {Container,Typography,List,ListItem,ListItemText,Button,Box,Paper,} from "@mui/material";
 import FondoEstrellas from "../components/FondoEstrellas";
+import { getProfile } from "../services/usuarioService";
 
 export default function Transacciones() {
   const [transacciones, setTransacciones] = useState([]);
   const token = sessionStorage.getItem("token");
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
+    
     const fetchData = async () => {
+      const userData = await getProfile(token);
+              setUser(userData);
       try {
         const data = await getMisTransferencias(token);
         setTransacciones(data);
@@ -119,42 +124,47 @@ export default function Transacciones() {
               {t.estado === "PENDIENTE" && (
                 <Box mt={2} display="flex" gap={2}color="white">
                   {["COMPRA", "VENTA"].includes(t.tipo) && (
-                    <>
-                      <Button
-                        variant="contained"
-                        color="success"
-                        onClick={() => manejarAprobarCompraVenta(t.id)}
-                      >
-                        Aprobar
-                      </Button>
-                      <Button
-                        variant="outlined"
-                        color="error"
-                        onClick={() => manejarCancelarCompraVenta(t.id)}
-                      >
-                        Rechazar
-                      </Button>
-                    </>
-                  )}
+  <>
+    {user && t.compradorId !== user.id && (
+      <Button
+        variant="contained"
+        color="success"
+        onClick={() => manejarAprobarCompraVenta(t.id)}
+      >
+        Aprobar
+      </Button>
+    )}
+    <Button
+      variant="outlined"
+      color="error"
+      onClick={() => manejarCancelarCompraVenta(t.id)}
+    >
+      Rechazar
+    </Button>
+  </>
+)}
 
                   {t.tipo === "TRANSFERENCIA" && (
-                    <>
-                      <Button
-                        variant="contained"
-                        color="success"
-                        onClick={() => manejarAprobarTransferencia(t.id)}
-                      >
-                        Aprobar
-                      </Button>
-                      <Button
-                        variant="outlined"
-                        color="error"
-                        onClick={() => manejarCancelarTransferencia(t.id)}
-                      >
-                        Rechazar
-                      </Button>
-                    </>
-                  )}
+  <>
+    {user && t.compradorId !== user.id && (
+      <Button
+        variant="contained"
+        color="success"
+        onClick={() => manejarAprobarTransferencia(t.id)}
+      >
+        Aprobar
+      </Button>
+    )}
+    <Button
+      variant="outlined"
+      color="error"
+      onClick={() => manejarCancelarTransferencia(t.id)}
+    >
+      Rechazar
+    </Button>
+  </>
+)}
+
                 </Box>
               )}
             </Paper>

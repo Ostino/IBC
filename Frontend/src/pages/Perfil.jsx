@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate, Link as RouterLink } from "react-router-dom";
-import {Container,Typography,Button,Stack,List,ListItem,ListItemText,Paper,Box,Grid} from "@mui/material";
+import {Container,Typography,Button,List,ListItem,ListItemText,Paper,Box,Grid} from "@mui/material";
 import { getProfile } from "../services/usuarioService";
 import { logoutAll } from "../services/authService";
 import { getAllMonedas } from "../services/monedaService";
@@ -24,7 +24,7 @@ export default function Profile() {
       try {
         const userData = await getProfile(token);
         setUser(userData);
-
+        console.log("Este es el userData ",userData)
         const [todasMonedas, billeterasUsuario] = await Promise.all([
           getAllMonedas(token),
           getBilleterasConMonedaUser(token),
