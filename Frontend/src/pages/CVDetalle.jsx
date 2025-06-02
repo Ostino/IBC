@@ -9,6 +9,7 @@ import {
   Paper,
 } from "@mui/material";
 import { crearTransaccion } from "../services/transaccionService";
+import FondoEstrellas from "../components/FondoEstrellas";
 
 export default function CompraVentaDetalle() {
   const { state } = useLocation();
@@ -46,8 +47,10 @@ export default function CompraVentaDetalle() {
   };
 
   return (
+         <>
+        <FondoEstrellas />
     <Container maxWidth="sm" sx={{ mt: 4, mb: 4 }}>
-      <Paper elevation={3} sx={{ p: 3 }}>
+      <Paper elevation={3} sx={{ p: 3,backgroundColor: "rgba(0, 0, 0, 0.6)",borderRadius: 2,color: "white", }}>
         <Typography variant="h5" gutterBottom>
           Detalle del Anuncio
         </Typography>
@@ -85,5 +88,6 @@ export default function CompraVentaDetalle() {
         </Button>
       </Paper>
     </Container>
+         </>
   );
 }

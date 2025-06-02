@@ -15,6 +15,7 @@ import {
 import { getAnunciosPorMonedaYTipo } from "../services/compraVentaService";
 import { obtenerUrlImagenPago } from "../services/imgeneService";
 import { getAllMonedas } from "../services/monedaService";  // Importa getAllMonedas
+import FondoEstrellas from "../components/FondoEstrellas";
 
 export default function CompraVenta() {
   const { idMoneda } = useParams();
@@ -56,6 +57,8 @@ export default function CompraVenta() {
   }, [idMoneda, tipoSeleccionado, token, navigate]);
 
   return (
+         <>
+        <FondoEstrellas />
     <Container maxWidth="md" sx={{ mt: 4 }}>
       <Typography variant="h4" gutterBottom>
         Anuncios de : {moneda ? moneda.nombre : `#${idMoneda}`}
@@ -84,7 +87,7 @@ export default function CompraVenta() {
         <Grid container spacing={3}>
           {anuncios.map((anuncio) => (
             <Grid item xs={12} sm={6} key={anuncio.id}>
-              <Card sx={{ height: "100%", display: "flex", flexDirection: "column" }}>
+              <Card sx={{ height: "100%", display: "flex", flexDirection: "column" ,backgroundColor: "rgba(31, 30, 30, 0.6)",borderRadius: 2,color: "white",}}>
                 <CardContent>
                   <Typography variant="h6" gutterBottom>
                     {anuncio.divisa}
@@ -118,5 +121,6 @@ export default function CompraVenta() {
         </Grid>
       )}
     </Container>
+    </>
   );
 }

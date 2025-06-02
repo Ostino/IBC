@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { crearTransferencia } from "../services/transaccionService";
 import { getBilleterasConMonedaUser } from "../services/billeteraService";
 import { getAllMonedas } from "../services/monedaService";
+import FondoEstrellas from "../components/FondoEstrellas";
 
 import {
   Container,
@@ -15,6 +16,7 @@ import {
   FormControl,
   Box,
   Paper,
+  Alert,
 } from "@mui/material";
 
 export default function CrearTransferencia() {
@@ -30,8 +32,13 @@ export default function CrearTransferencia() {
   const [misBilleteras, setMisBilleteras] = useState([]);
   const token = sessionStorage.getItem("token");
   const navigate = useNavigate();
+  const [success, setSuccess] = useState("");
 
   useEffect(() => {
+    if (!token) {
+      navigate("/login");
+      return;
+    }
     const cargarBilleteras = async () => {
       try {
         const [billeteras, monedas] = await Promise.all([
@@ -55,6 +62,7 @@ export default function CrearTransferencia() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setSuccess("");
 
     const data = new FormData();
     data.append("tipo", formData.tipo);
@@ -68,8 +76,7 @@ export default function CrearTransferencia() {
 
     try {
       await crearTransferencia(data, token);
-      alert("Transferencia creada exitosamente");
-      navigate("/transacciones");
+      setSuccess("Transferencia creada exitosamente.");
     } catch (err) {
       console.error("Error al crear transferencia:", err);
       alert("Error al crear la transferencia");
@@ -77,102 +84,121 @@ export default function CrearTransferencia() {
   };
 
   return (
-    <Container maxWidth="sm" sx={{ mt: 4, mb: 4 }}>
-      <Paper elevation={3} sx={{ p: 4 }}>
-        <Typography variant="h5" gutterBottom>
-          Crear Transferencia
-        </Typography>
-
-        <Box
-          component="form"
-          onSubmit={handleSubmit}
-          encType="multipart/form-data"
-          noValidate
-          sx={{ mt: 2 }}
+    <>
+      <FondoEstrellas />
+      <Container maxWidth="sm" sx={{ mt: 4, mb: 4 }}>
+        <Paper
+          elevation={3}
+          sx={{
+            p: 4,
+            backgroundColor: "rgba(0, 0, 0, 0.6)",
+            borderRadius: 2,
+            color: "white",
+          }}
         >
-          <TextField
-            label="Monto"
-            type="number"
-            required
-            fullWidth
-            margin="normal"
-            value={formData.monto}
-            onChange={(e) =>
-              setFormData({ ...formData, monto: e.target.value })
-            }
-            inputProps={{ min: 0, step: "0.01" }}
-          />
-
-          <TextField
-            label="Descripción del pago"
-            required
-            fullWidth
-            margin="normal"
-            value={formData.descripcionPago}
-            onChange={(e) =>
-              setFormData({ ...formData, descripcionPago: e.target.value })
-            }
-          />
-
-          <FormControl fullWidth margin="normal" required>
-            <InputLabel id="de-billetera-label">De billetera</InputLabel>
-            <Select
-              labelId="de-billetera-label"
-              value={formData.deBilleteraId}
-              label="De billetera"
-              onChange={(e) =>
-                setFormData({ ...formData, deBilleteraId: e.target.value })
-              }
-            >
-              <MenuItem value="">
-                <em>Seleccione una billetera</em>
-              </MenuItem>
-              {misBilleteras.map((b) => (
-                <MenuItem key={b.id} value={b.id}>
-                  {b.moneda?.nombre || "Moneda desconocida"} (Saldo: {b.saldo})
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-
-          <TextField
-            label="Hacia billetera (ID)"
-            required
-            fullWidth
-            margin="normal"
-            value={formData.haciaBilleteraId}
-            onChange={(e) =>
-              setFormData({ ...formData, haciaBilleteraId: e.target.value })
-            }
-          />
-
-          <Box sx={{ mt: 2, mb: 3 }}>
-            <InputLabel htmlFor="comprobantePago" required>
-              Comprobante de pago
-            </InputLabel>
-            <input
-              id="comprobantePago"
-              type="file"
-              accept="image/*"
-              required
-              onChange={(e) =>
-                setFormData({ ...formData, comprobantePago: e.target.files[0] })
-              }
-              style={{ marginTop: 8 }}
-            />
-          </Box>
-
-          <Button
-            type="submit"
-            variant="contained"
-            color="primary"
-            fullWidth
-            size="large"
+          <Typography variant="h5" gutterBottom>
+            Crear Transferencia
+          </Typography>
+          {success && (
+            <Alert severity="success" sx={{ mt: 2 }}>
+              {success}
+            </Alert>
+          )}
+          <Box
+            component="form"
+            onSubmit={handleSubmit}
+            encType="multipart/form-data"
+            noValidate
+            sx={{ mt: 2 }}
           >
-            Enviar Transferencia
-          </Button>
-        </Box>
-      </Paper>
-    </Container>
+            <TextField
+              label="Monto"
+              type="number"
+              required
+              fullWidth
+              margin="normal"
+              value={formData.monto}
+              onChange={(e) =>
+                setFormData({ ...formData, monto: e.target.value })
+              }
+              inputProps={{ min: 0, step: "0.01" }}
+            />
+
+            <TextField
+              label="Descripción del pago"
+              required
+              fullWidth
+              margin="normal"
+              value={formData.descripcionPago}
+              onChange={(e) =>
+                setFormData({ ...formData, descripcionPago: e.target.value })
+              }
+            />
+
+            <FormControl fullWidth margin="normal" required>
+              <InputLabel id="de-billetera-label">De billetera</InputLabel>
+              <Select
+                labelId="de-billetera-label"
+                value={formData.deBilleteraId}
+                label="De billetera"
+                onChange={(e) =>
+                  setFormData({ ...formData, deBilleteraId: e.target.value })
+                }
+              >
+                <MenuItem value="">
+                  <em>Seleccione una billetera</em>
+                </MenuItem>
+                {misBilleteras.map((b) => (
+                  <MenuItem key={b.id} value={b.id}>
+                    {b.moneda?.nombre || "Moneda desconocida"} (Saldo: {b.saldo}
+                    )
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+
+            <TextField
+              label="Hacia billetera (ID)"
+              required
+              fullWidth
+              margin="normal"
+              value={formData.haciaBilleteraId}
+              onChange={(e) =>
+                setFormData({ ...formData, haciaBilleteraId: e.target.value })
+              }
+            />
+
+            <Box sx={{ mt: 2, mb: 3 }}>
+              <InputLabel htmlFor="comprobantePago" required>
+                Comprobante de pago
+              </InputLabel>
+              <input
+                id="comprobantePago"
+                type="file"
+                accept="image/*"
+                required
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    comprobantePago: e.target.files[0],
+                  })
+                }
+                style={{ marginTop: 8 }}
+              />
+            </Box>
+
+            <Button
+              type="submit"
+              variant="contained"
+              color="primary"
+              fullWidth
+              size="large"
+            >
+              Enviar Transferencia
+            </Button>
+          </Box>
+        </Paper>
+      </Container>
+    </>
   );
 }
