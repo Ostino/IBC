@@ -33,6 +33,7 @@ export default function CrearTransferencia() {
   const token = sessionStorage.getItem("token");
   const navigate = useNavigate();
   const [success, setSuccess] = useState("");
+  const [error, setError] = useState("");
 
   useEffect(() => {
     if (!token) {
@@ -60,28 +61,34 @@ export default function CrearTransferencia() {
     if (token) cargarBilleteras();
   }, [token]);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setSuccess("");
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  setSuccess("");
+    setError("");
 
-    const data = new FormData();
-    data.append("tipo", formData.tipo);
-    data.append("monto", formData.monto);
-    data.append("descripcionPago", formData.descripcionPago);
-    data.append("deBilleteraId", formData.deBilleteraId);
-    data.append("haciaBilleteraId", formData.haciaBilleteraId);
-    if (formData.comprobantePago) {
-      data.append("comprobantePago", formData.comprobantePago);
-    }
+  if (!formData.comprobantePago) {
+    setError("Por favor sube el comprobante del pago");
+    return;
+  }
 
-    try {
-      await crearTransferencia(data, token);
-      setSuccess("Transferencia creada exitosamente.");
-    } catch (err) {
-      console.error("Error al crear transferencia:", err);
-      alert("Error al crear la transferencia");
-    }
-  };
+  const data = new FormData();
+  data.append("tipo", formData.tipo);
+  data.append("monto", formData.monto);
+  data.append("descripcionPago", formData.descripcionPago);
+  data.append("deBilleteraId", formData.deBilleteraId);
+  data.append("haciaBilleteraId", formData.haciaBilleteraId);
+  data.append("comprobantePago", formData.comprobantePago);
+
+  try {
+    await crearTransferencia(data, token);
+    setSuccess("Transferencia creada exitosamente.");
+    setTimeout(() => navigate("/profile"), 1000);
+  } catch (err) {
+    console.error("Error al crear transferencia:", err);
+    alert("Error al crear la transferencia");
+  }
+};
+
 
   return (
     <>
@@ -99,6 +106,11 @@ export default function CrearTransferencia() {
           <Typography variant="h5" gutterBottom>
             Crear Transferencia
           </Typography>
+          {error && (
+                      <Alert severity="error" sx={{ mt: 2 }}>
+                        {error}
+                      </Alert>
+                    )}
           {success && (
             <Alert severity="success" sx={{ mt: 2 }}>
               {success}

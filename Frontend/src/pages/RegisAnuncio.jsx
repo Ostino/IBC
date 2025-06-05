@@ -77,6 +77,8 @@ const RegistrarAnuncio = () => {
     try {
       await registrarAnuncio(formData, token);
       setSuccess("Anuncio creado exitosamente.");
+      setTimeout(() => navigate("/profile"), 1000);
+
     } catch (err) {
       console.error("Error al crear anuncio:", err);
       setError("Error al registrar el anuncio. Intenta de nuevo.");
@@ -99,6 +101,11 @@ const RegistrarAnuncio = () => {
           <Typography variant="h5" gutterBottom>
             Registrar Anuncio
           </Typography>
+          {error && (
+                      <Alert severity="error" sx={{ mt: 2 }}>
+                        {error}
+                      </Alert>
+                    )}
           {success && (
             <Alert severity="success" sx={{ mt: 2 }}>
               {success}

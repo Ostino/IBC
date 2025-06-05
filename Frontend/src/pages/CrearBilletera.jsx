@@ -79,7 +79,7 @@ export default function CrearBilletera() {
         token
       );
       setSuccess("Billetera creada exitosamente.");
-      setTimeout(() => navigate("/profile"), 1500);
+      setTimeout(() => navigate("/profile"), 1000);
     } catch (error) {
       console.error("Error al crear billetera:", error);
       setError("No se pudo crear la billetera. Intenta de nuevo.");

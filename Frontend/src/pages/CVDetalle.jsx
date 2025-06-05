@@ -4,7 +4,7 @@ import {
   Container,
   Typography,
   Button,
-  TextField,
+  Alert,
   Box,
   Paper,
 } from "@mui/material";
@@ -17,6 +17,8 @@ export default function CompraVentaDetalle() {
   const [comprobante, setComprobante] = useState(null);
   const token = sessionStorage.getItem("token");
   const navigate = useNavigate();
+  const [success, setSuccess] = useState("");
+  const [error, setError] = useState("");
 
   useEffect(() => {
     if (!token) {
@@ -31,15 +33,17 @@ export default function CompraVentaDetalle() {
   };
 
   const handleTransaccion = async () => {
+    setError("");
+    setSuccess("");
     if (!comprobante) {
-      alert("Debe adjuntar una imagen comprobante.");
+    setError("Por favor adjunte el comprobante");
       return;
     }
 
     try {
       await crearTransaccion(anuncio.id, comprobante, token);
-      alert("Transacción realizada con éxito.");
-      navigate("/profile");
+      setSuccess("Solicitud enviada correctamente");
+      setTimeout(() => navigate("/profile"), 1000);
     } catch (error) {
       console.error("Error en la transacción:", error);
       alert("Hubo un error al realizar la transacción.");
@@ -54,7 +58,16 @@ export default function CompraVentaDetalle() {
         <Typography variant="h5" gutterBottom>
           Detalle del Anuncio
         </Typography>
-
+{error && (
+                      <Alert severity="error" sx={{ mt: 2 }}>
+                        {error}
+                      </Alert>
+                    )}
+          {success && (
+            <Alert severity="success" sx={{ mt: 2 }}>
+              {success}
+            </Alert>
+          )}
         <Box sx={{ mb: 2 }}>
           <Typography><strong>Tipo:</strong> {anuncio.tipo}</Typography>
           <Typography><strong>Precio por unidad:</strong> {anuncio.precioPorUnidad}</Typography>

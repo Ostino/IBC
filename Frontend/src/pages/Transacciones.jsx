@@ -190,32 +190,29 @@ export default function Transacciones() {
                         </>
                       )}
 
-                      {t.tipo === "TRANSFERENCIA" && (
-                        <>
-                          {user &&
-                            (t.tipo === "TRANSFERENCIA" ||
-                              t.compradorId !== user.id) && (
-                              <Button
-                                variant="contained"
-                                color="success"
-                                onClick={() => {
-                                  if (t.tipo === "TRANSFERENCIA") {
-                                    manejarAprobarTransferencia(t.id);
-                                  }
-                                }}
-                              >
-                                Aprobar
-                              </Button>
-                            )}
-                          <Button
-                            variant="outlined"
-                            color="error"
-                            onClick={() => manejarCancelarTransferencia(t.id)}
-                          >
-                            Rechazar
-                          </Button>
-                        </>
-                      )}
+{t.tipo === "TRANSFERENCIA" && (
+  <>
+    {user && (
+      (t.compradorId !== user.id || t.compradorId === t.vendedorId) && (
+        <Button
+          variant="contained"
+          color="success"
+          onClick={() => manejarAprobarTransferencia(t.id)}
+        >
+          Aprobar
+        </Button>
+      )
+    )}
+    <Button
+      variant="outlined"
+      color="error"
+      onClick={() => manejarCancelarTransferencia(t.id)}
+    >
+      Rechazar
+    </Button>
+  </>
+)}
+
                     </Box>
                   )}
                 </Paper>
