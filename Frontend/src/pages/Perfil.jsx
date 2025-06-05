@@ -128,56 +128,66 @@ export default function Profile() {
           <Typography>No tienes billeteras.</Typography>
         ) : (
           <List>
-            {billeteras.map((b) => (
-              <ListItem key={b.id}>
-                <ListItemText 
-                  primary={`${b.moneda.nombre} (ID: ${b.id})`}
-                  secondary={`Saldo: ${b.saldo}`} 
-                  sx={{ color: "white" }}
-                />
-              </ListItem>
-            ))}
-          </List>
+  {billeteras.map((b) => (
+    <Box
+      key={b.id}
+      sx={{
+        backgroundColor: "#936a4d", // verde oscuro
+        borderTop: "6px solid #4caf50", // línea verde
+        borderRadius: 2,
+        p: 2,
+        mb: 2,
+        color: "white",
+      }}
+    >
+      <Typography variant="subtitle1" fontWeight="bold">
+        {b.moneda.nombre} (ID: {b.id})
+      </Typography>
+      <Typography variant="body2">Saldo: {b.saldo}</Typography>
+    </Box>
+  ))}
+</List>
+
         )}
       </Paper>
 
       <Paper elevation={3} sx={{ p: 3,mb: 4,backgroundColor: "rgba(0, 0, 0, 0.6)",borderRadius: 2,color: "white", }}>
   <Typography variant="h5" gutterBottom>Monedas disponibles</Typography>
-  <Box display="flex" flexWrap="wrap" gap={2}>
-    {monedas.map((moneda) => {
-      const tieneBilletera = billeteras.some((b) => b.moneda.id === moneda.id);
+ <Box display="flex" flexWrap="wrap" gap={2}>
+  {monedas.map((moneda) => {
+    const tieneBilletera = billeteras.some((b) => b.moneda.id === moneda.id);
 
-      return (
-        <Box
-          key={moneda.id}
-          component={RouterLink}
-          to={`/compraventa/${moneda.id}`}
-          sx={{
-            textDecoration: "none",
-            color: "inherit",
-            borderRadius: 2,
-            padding: 2,
-            width: 220,
-            backgroundColor: "#936a4d", // marrón claro
-            borderTop: tieneBilletera ? "6px solid #4caf50" : "6px solid transparent",
-            boxShadow: 2,
-            transition: "transform 0.2s",
-            '&:hover': {
-              transform: "scale(1.03)",
-              boxShadow: 4
-            }
-          }}
-        >
-          <Typography variant="subtitle1" fontWeight="bold">
-            {moneda.codigo} - {moneda.nombre}
-          </Typography>
-          <Typography variant="body2">
-            1 = {moneda.valueInSus} SUS
-          </Typography>
-        </Box>
-      );
-    })}
-  </Box>
+    return (
+      <Box
+        key={moneda.id}
+        component={RouterLink}
+        to={`/compraventa/${moneda.id}`}
+        sx={{
+          textDecoration: "none",
+          color: "inherit",
+          borderRadius: 2,
+          padding: 2,
+          width: 220,
+          backgroundColor: "#c0c0c0",
+          borderTop: tieneBilletera ? "6px solid #4caf50" : "6px solid transparent",
+          boxShadow: 2,
+          transition: "transform 0.2s",
+          '&:hover': {
+            transform: "scale(1.03)",
+            boxShadow: 4
+          }
+        }}
+      >
+        <Typography variant="subtitle1" fontWeight="bold">
+          {moneda.codigo} - {moneda.nombre}
+        </Typography>
+        <Typography variant="body2">
+          1 = {moneda.valueInSus} SUS
+        </Typography>
+      </Box>
+    );
+  })}
+</Box>
 </Paper>
     </Container>
     </>
